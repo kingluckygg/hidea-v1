@@ -1789,6 +1789,224 @@ body {
 }
 
 
+/* ==================================================
+   LEAVE LOBBY
+================================================== */
+
+.leave-btn {
+
+    position: absolute;
+
+    top:
+        calc(
+            18px +
+            env(safe-area-inset-top)
+        );
+
+    right:
+        calc(
+            18px +
+            env(safe-area-inset-right)
+        );
+
+    z-index: 3;
+
+    height: 34px;
+
+    padding: 0 14px;
+
+    border-radius: 17px;
+
+    border:
+        1px solid
+        var(--error);
+
+    background:
+        color-mix(
+            in srgb,
+            var(--error) 12%,
+            var(--button-background) 80%
+        );
+
+    backdrop-filter:
+        blur(10px);
+
+    -webkit-backdrop-filter:
+        blur(10px);
+
+    box-shadow:
+        0 3px 12px
+        rgba(0,0,0,.14);
+
+    color:
+        var(--error);
+
+    font-family:
+        var(--font-heading);
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    letter-spacing: .4px;
+
+    cursor: pointer;
+
+    transition:
+        transform .12s ease;
+}
+
+
+.leave-btn:active {
+
+    transform:
+        scale(.95);
+}
+
+
+.leave-confirm {
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 700;
+
+    display: none;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background:
+        rgba(0,0,0,.45);
+}
+
+
+.leave-confirm.open {
+
+    display: flex;
+}
+
+
+.leave-confirm-box {
+
+    width: min(320px, 86vw);
+
+    padding: 24px 22px;
+
+    border-radius: 18px;
+
+    border:
+        1px solid
+        var(--border);
+
+    background:
+        var(--background);
+
+    box-shadow:
+        0 10px 30px
+        rgba(0,0,0,.25);
+
+    text-align: center;
+}
+
+
+.leave-confirm-title {
+
+    font-family:
+        var(--font-heading);
+
+    font-size: 16px;
+
+    font-weight: 700;
+
+    color:
+        var(--text);
+
+    margin-bottom: 8px;
+}
+
+
+.leave-confirm-body {
+
+    font-size: 13px;
+
+    color:
+        var(--muted);
+
+    line-height: 1.4;
+
+    margin-bottom: 20px;
+}
+
+
+.leave-confirm-actions {
+
+    display: flex;
+
+    gap: 10px;
+}
+
+
+.leave-confirm-actions button {
+
+    flex: 1;
+
+    height: 40px;
+
+    border-radius: 12px;
+
+    font-family:
+        var(--font-heading);
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    letter-spacing: .4px;
+
+    cursor: pointer;
+
+    transition:
+        transform .12s ease;
+}
+
+
+.leave-confirm-actions button:active {
+
+    transform:
+        scale(.95);
+}
+
+
+#leaveCancelBtn {
+
+    border:
+        1px solid
+        var(--border);
+
+    background:
+        var(--button-background);
+
+    color:
+        var(--text);
+}
+
+
+#leaveConfirmBtn {
+
+    border:
+        1px solid
+        var(--error);
+
+    background:
+        var(--error);
+
+    color: #fff;
+}
+
+
 .admin-panel-inner {
 
     width: 100%;
@@ -2748,6 +2966,13 @@ body {
     </button>
 
 
+    <button
+        class="leave-btn"
+        id="leaveBtn">
+        LEAVE LOBBY
+    </button>
+
+
 </div>
 
 
@@ -2774,6 +2999,43 @@ body {
         <div
             id="adminRoomList"
             class="admin-room-list">
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ==================================================
+     LEAVE LOBBY CONFIRM
+================================================== -->
+
+<div
+    id="leaveConfirm"
+    class="leave-confirm">
+
+    <div class="leave-confirm-box">
+
+        <div class="leave-confirm-title">
+            Leave this lobby?
+        </div>
+
+        <div class="leave-confirm-body">
+            You'll stop sharing your location
+            with this room and return to the
+            home screen.
+        </div>
+
+        <div class="leave-confirm-actions">
+
+            <button id="leaveCancelBtn">
+                CANCEL
+            </button>
+
+            <button id="leaveConfirmBtn">
+                LEAVE
+            </button>
+
         </div>
 
     </div>
@@ -3053,6 +3315,18 @@ const adminCloseBtn =
 
 const adminRoomList =
     document.getElementById("adminRoomList");
+
+const leaveBtn =
+    document.getElementById("leaveBtn");
+
+const leaveConfirm =
+    document.getElementById("leaveConfirm");
+
+const leaveCancelBtn =
+    document.getElementById("leaveCancelBtn");
+
+const leaveConfirmBtn =
+    document.getElementById("leaveConfirmBtn");
 
 
 /* ==================================================
@@ -3412,7 +3686,14 @@ function updateLocation(position) {
 
     myLastLng = filtered.lng;
 
-    updateAccuracyCircle(rawAccuracy);
+    /* show the filter's own confidence (sqrt of its
+       tracked variance) rather than the raw, jumpier
+       per-fix accuracy — this is what actually
+       represents how sure we are of the dot's
+       position on screen */
+    updateAccuracyCircle(
+        Math.sqrt(posVariance)
+    );
 
 
     /* ---- move the backdrop so it looks like the
@@ -3476,19 +3757,52 @@ function updateLocation(position) {
 
 
 /* ==================================================
-   GPS SMOOTHING
-   Blends new fixes toward the previous position
-   instead of snapping to every raw sample, and
-   ignores fixes worse than 75m. The blend weight
-   depends on how confident the new fix is.
+   GPS SMOOTHING — 2D Kalman filter
+   Instead of ad-hoc alpha-blending, this tracks a
+   real position estimate plus its own uncertainty
+   (variance, in metres²) over time:
+     - between fixes, uncertainty grows (you might
+       have walked, so trust the old estimate less)
+     - each new fix has its own uncertainty (accuracy²)
+     - the Kalman gain works out, fix-by-fix, exactly
+       how much to trust the new sample vs. the old
+       estimate — sharp fixes pull hard, noisy fixes
+       barely move the needle
+   This reacts to real movement immediately (gain
+   rises with elapsed time) while suppressing jitter
+   from a static, noisy signal (gain stays low when
+   fixes disagree with a settled, confident estimate).
 ================================================== */
 
 let filteredLat = null;
 
 let filteredLng = null;
 
+/* current position uncertainty, in metres² */
+let posVariance = 0;
+
+let lastFixTime = null;
+
+/* assumed worst-case speed (m/s) used to grow
+   uncertainty between fixes — about a fast jog */
+const GPS_PROCESS_SPEED = 2.2;
+
+/* accuracy this bad (patchy signal, indoors, etc.)
+   tells us almost nothing useful */
+const GPS_MAX_ACCEPT_ACCURACY = 75;
+
 
 function filterPosition(lat, lng, accuracy) {
+
+    const now = Date.now();
+
+    /* GPS accuracy fields can occasionally report 0
+       or absurdly small values that would make the
+       filter over-trust a single fix — floor it */
+    const measVariance =
+        Math.max(accuracy, 3) *
+        Math.max(accuracy, 3);
+
 
     if (filteredLat === null) {
 
@@ -3496,12 +3810,27 @@ function filterPosition(lat, lng, accuracy) {
 
         filteredLng = lng;
 
+        posVariance = measVariance;
+
+        lastFixTime = now;
+
         return { lat: lat, lng: lng };
     }
 
-    /* a fix this bad (patchy signal, indoors, etc.)
-       tells us almost nothing — hold position */
-    if (accuracy > 75) {
+
+    /* a fix this bad tells us almost nothing —
+       skip it, but still let uncertainty grow so
+       the next good fix is trusted appropriately */
+    if (accuracy > GPS_MAX_ACCEPT_ACCURACY) {
+
+        const dtBad =
+            (now - lastFixTime) / 1000;
+
+        posVariance +=
+            (GPS_PROCESS_SPEED * GPS_PROCESS_SPEED)
+            * Math.max(dtBad, 0);
+
+        lastFixTime = now;
 
         return {
             lat: filteredLat,
@@ -3509,45 +3838,80 @@ function filterPosition(lat, lng, accuracy) {
         };
     }
 
-    const movedMeters =
-        Math.hypot(
-            metersEastWest(
-                filteredLat,
-                filteredLng,
-                lng
+
+    const dt =
+        Math.min(
+            Math.max(
+                (now - lastFixTime) / 1000,
+                0
             ),
-            metersNorthSouth(
-                filteredLat,
-                lat
+            10
+        );
+
+    lastFixTime = now;
+
+    /* uncertainty grows the longer it's been since
+       our last fix — we could have moved that far */
+    posVariance +=
+        (GPS_PROCESS_SPEED * GPS_PROCESS_SPEED) * dt;
+
+
+    /* work in local metres so the same gain applies
+       equally to both axes regardless of latitude */
+    const dxMeters =
+        metersEastWest(filteredLat, filteredLng, lng);
+
+    const dyMeters =
+        metersNorthSouth(filteredLat, lat);
+
+
+    /* Kalman gain: how much of the new measurement
+       to trust vs. the existing estimate */
+    const gain =
+        posVariance / (posVariance + measVariance);
+
+
+    /* an isolated fix that disagrees wildly with a
+       settled, confident estimate is more likely a
+       multipath/reflection spike than real motion —
+       the gain above already discounts it, but on
+       a strong outlier (>6 sigma) ignore it outright
+       rather than let one bad sample skew the track */
+    const sigma =
+        Math.sqrt(posVariance + measVariance);
+
+    const jumpMeters =
+        Math.hypot(dxMeters, dyMeters);
+
+    if (jumpMeters > sigma * 6 && sigma < 40) {
+
+        return {
+            lat: filteredLat,
+            lng: filteredLng
+        };
+    }
+
+
+    const newLat =
+        filteredLat +
+        (dyMeters * gain / 111320);
+
+    const newLng =
+        filteredLng +
+        (
+            dxMeters * gain /
+            (
+                111320 *
+                Math.cos(filteredLat * Math.PI / 180)
             )
         );
 
-    /* GPS noise floor scales with reported accuracy —
-       treat tiny "movement" smaller than that as
-       standing still, not a real step */
-    const noiseFloor =
-        Math.max(accuracy * .5, 3);
+    filteredLat = newLat;
 
-    if (movedMeters < noiseFloor) {
+    filteredLng = newLng;
 
-        return {
-            lat: filteredLat,
-            lng: filteredLng
-        };
-    }
-
-    /* trust sharper fixes more; blend toward them
-       instead of teleporting straight to them */
-    const alpha =
-        accuracy < 10 ? .9 :
-        accuracy < 25 ? .6 :
-                        .3;
-
-    filteredLat +=
-        (lat - filteredLat) * alpha;
-
-    filteredLng +=
-        (lng - filteredLng) * alpha;
+    posVariance =
+        (1 - gain) * posVariance;
 
     return {
         lat: filteredLat,
@@ -4018,6 +4382,126 @@ function switchGame(newCode) {
         });
     }
 }
+
+
+/* ==================================================
+   LEAVE LOBBY
+   Cleanly disconnects from the current game and
+   returns to the home/setup screen — this is the
+   voluntary version of what onDisconnect() does
+   automatically when the tab is closed.
+================================================== */
+
+function leaveGame() {
+
+    /* stop pushing/listening for position updates
+       in the room we're leaving */
+    if (playersRef) {
+
+        playersRef.off();
+
+        if (myGameCode) {
+
+            db.ref(
+                "games/" + myGameCode +
+                "/players/" + myUid
+            ).remove();
+        }
+
+        playersRef = null;
+    }
+
+
+    /* stop watching GPS — no point tracking location
+       while sitting on the home screen */
+    if (locationWatch !== null) {
+
+        navigator.geolocation
+            .clearWatch(locationWatch);
+
+        locationWatch = null;
+    }
+
+
+    /* wipe other players off both the map and grid,
+       and drop our own map marker if it was showing */
+    clearMapPlayers();
+
+    clearGridPlayers();
+
+    hideSelfMapMarker();
+
+    followMe = true;
+
+    lastPlayersSnapshot = {};
+
+    myLastLat = null;
+
+    myLastLng = null;
+
+
+    /* reset the GPS smoothing filter so the next
+       game starts from a clean fix instead of
+       blending toward a stale, old position */
+    filteredLat = null;
+
+    filteredLng = null;
+
+    posVariance = 0;
+
+    lastFixTime = null;
+
+
+    /* close the admin panel if it happened to be
+       open, and drop admin status — re-enter the
+       key next time to regain it */
+    closeAdminPanel();
+
+    isAdmin = false;
+
+    adminBtn.style.display = "none";
+
+
+    hideLocationError();
+
+    recenterBtn.classList.remove("visible");
+
+
+    myGameCode = "";
+
+
+    /* back to the home screen */
+    setup.style.display = "flex";
+}
+
+
+leaveBtn.addEventListener(
+    "click",
+    function() {
+
+        leaveConfirm.classList.add("open");
+    }
+);
+
+
+leaveCancelBtn.addEventListener(
+    "click",
+    function() {
+
+        leaveConfirm.classList.remove("open");
+    }
+);
+
+
+leaveConfirmBtn.addEventListener(
+    "click",
+    function() {
+
+        leaveConfirm.classList.remove("open");
+
+        leaveGame();
+    }
+);
 
 
 /* ==================================================
