@@ -3144,6 +3144,11 @@ let compassStarted = false;
 
 let lastHeadingDeg = 0;
 
+/* smoothed value actually drawn on screen — the raw
+   compass event above updates lastHeadingDeg, but the
+   arrow follows this smoothed copy instead */
+let displayHeadingDeg = null;
+
 let selectedColor =
     localStorage.getItem(
         "hidea_color"
@@ -3981,7 +3986,7 @@ function showSelfMapMarker(lat, lng) {
             html: avatarHTML(
                 playerName.textContent,
                 selectedColor,
-                lastHeadingDeg
+                (displayHeadingDeg !== null ? displayHeadingDeg : lastHeadingDeg)
             ),
             className: "",
             iconSize: [40, 40]
@@ -4801,7 +4806,7 @@ function sendMyPosition(coords) {
         color: selectedColor,
         lat: coords.latitude,
         lng: coords.longitude,
-        heading: lastHeadingDeg,
+        heading: (displayHeadingDeg !== null ? displayHeadingDeg : lastHeadingDeg),
         updatedAt:
             firebase.database.ServerValue
                 .TIMESTAMP
@@ -5299,11 +5304,38 @@ function handleCompass(event) {
     lastHeadingDeg = direction;
 
 
+    /* raw compass readings jitter by several degrees
+       even when the phone is dead still — smooth
+       toward each new reading instead of snapping the
+       arrow straight to it. Handles the 0°/360° wrap
+       (e.g. 359° -> 2°) as a short turn, not a
+       360-degree spin */
+    if (displayHeadingDeg === null) {
+
+        displayHeadingDeg = direction;
+
+    } else {
+
+        let delta =
+            (
+                (direction - displayHeadingDeg + 540)
+                % 360
+            ) - 180;
+
+        displayHeadingDeg =
+            (
+                displayHeadingDeg +
+                delta * .12 +
+                360
+            ) % 360;
+    }
+
+
     heading.style.transform =
 
         "translateX(-50%) rotate("
         +
-        direction
+        displayHeadingDeg
         +
         "deg)";
 }
