@@ -1,0 +1,4968 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width,
+initial-scale=1.0,
+maximum-scale=1.0,
+user-scalable=no,
+viewport-fit=cover">
+
+<title>H.I.D.E.A.</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@500;600&display=swap"
+    rel="stylesheet"
+>
+
+<style>
+
+/* ==================================================
+   H.I.D.E.A. COLOUR SYSTEM
+================================================== */
+
+:root {
+
+    --background: #D3D3D3;
+    --primary: #282828;
+    --secondary: #282828;
+    --text: #282828;
+    --muted: #666666;
+    --globe-line: #8f8f8f;
+    --border: #aaaaaa;
+    --button-background: #D3D3D3;
+
+    --blue: #4285f4;
+    --blue-light: #4da9ed;
+    --blue-dark: #174f9c;
+
+    --error: #b51f1f;
+
+    --player-color: #4285f4;
+
+    --font-heading:
+        "Space Grotesk",
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    --font-mono:
+        "JetBrains Mono",
+        "Courier New",
+        monospace;
+}
+
+
+@media (prefers-color-scheme: dark) {
+
+    :root {
+
+        --background: #282828;
+        --primary: #D3D3D3;
+        --secondary: #D3D3D3;
+        --text: #D3D3D3;
+        --muted: #999999;
+        --globe-line: #686868;
+        --border: #555555;
+        --button-background: #282828;
+
+        --blue: #5b9df9;
+        --blue-light: #67b5f4;
+        --blue-dark: #2865b5;
+
+        --error: #ff5c5c;
+    }
+}
+
+
+/* ==================================================
+   BASE
+================================================== */
+
+* {
+
+    box-sizing: border-box;
+
+    -webkit-tap-highlight-color:
+        transparent;
+
+    user-select: none;
+}
+
+
+html,
+body {
+
+    margin: 0;
+
+    width: 100%;
+    height: 100%;
+
+    overflow: hidden;
+
+    background:
+        var(--background);
+
+    color:
+        var(--text);
+
+    font-family:
+        var(--font-heading);
+
+    transition:
+        background .25s ease,
+        color .25s ease;
+}
+
+
+body {
+
+    padding:
+        env(safe-area-inset-top)
+        env(safe-area-inset-right)
+        env(safe-area-inset-bottom)
+        env(safe-area-inset-left);
+}
+
+
+/* ==================================================
+   SPLASH SCREEN
+================================================== */
+
+#splash {
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 1000;
+
+    background:
+        var(--background);
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    animation:
+        splashOut
+        .65s
+        ease
+        4.8s
+        forwards;
+
+    transition:
+        background .25s ease;
+}
+
+
+.logo {
+
+    width: 72vw;
+
+    max-width: 300px;
+
+    overflow: visible;
+
+    animation:
+        logoZoomOut
+        .8s
+        cubic-bezier(.16,1,.3,1)
+        3.1s
+        forwards;
+}
+
+
+@keyframes logoZoomOut {
+
+    0% {
+
+        transform:
+            scale(1);
+    }
+
+    100% {
+
+        transform:
+            scale(.72);
+    }
+}
+
+
+/* ==================================================
+   GLOBE
+================================================== */
+
+.globe {
+
+    opacity: 0;
+
+    transform-origin:
+        250px 225px;
+
+    animation:
+
+        globeIn
+        1s
+        cubic-bezier(.16,1,.3,1)
+        .15s
+        forwards,
+
+        globeFloat
+        2.5s
+        ease-in-out
+        1.2s
+        infinite;
+}
+
+
+@keyframes globeIn {
+
+    0% {
+
+        opacity: 0;
+
+        transform:
+            scale(.55)
+            rotate(-15deg);
+    }
+
+    70% {
+
+        opacity: 1;
+
+        transform:
+            scale(1.05)
+            rotate(2deg);
+    }
+
+    100% {
+
+        opacity: 1;
+
+        transform:
+            scale(1)
+            rotate(0deg);
+    }
+}
+
+
+@keyframes globeFloat {
+
+    0%,
+    100% {
+
+        transform:
+            translateY(0);
+    }
+
+    50% {
+
+        transform:
+            translateY(-4px);
+    }
+}
+
+
+/* ==================================================
+   GLOBE LINES
+================================================== */
+
+.globeLines {
+
+    opacity: 0;
+
+    stroke-dasharray: 500;
+
+    animation:
+        linesIn
+        .8s
+        ease
+        .65s
+        forwards;
+}
+
+
+@keyframes linesIn {
+
+    from {
+
+        opacity: 0;
+
+        stroke-dashoffset:
+            500;
+    }
+
+    to {
+
+        opacity: 1;
+
+        stroke-dashoffset:
+            0;
+    }
+}
+
+
+/* ==================================================
+   CARDINAL MARKERS
+================================================== */
+
+.cardinal {
+
+    opacity: 0;
+
+    transform-origin:
+        center;
+
+    animation:
+        cardinalIn
+        .65s
+        cubic-bezier(.16,1,.3,1)
+        forwards;
+
+    stroke:
+        var(--primary);
+}
+
+
+.cardinal.east {
+
+    animation-delay:
+        1.08s;
+}
+
+
+.cardinal.south {
+
+    animation-delay:
+        1.21s;
+}
+
+
+.cardinal.west {
+
+    animation-delay:
+        1.34s;
+}
+
+
+@keyframes cardinalIn {
+
+    0% {
+
+        opacity: 0;
+
+        transform:
+            scale(.3);
+    }
+
+    70% {
+
+        opacity: 1;
+
+        transform:
+            scale(1.12);
+    }
+
+    100% {
+
+        opacity: 1;
+
+        transform:
+            scale(1);
+    }
+}
+
+
+/* ==================================================
+   NAVIGATION ARROW
+================================================== */
+
+.navArrow {
+
+    opacity: 0;
+
+    transform-origin:
+        250px 210px;
+
+    animation:
+
+        arrowIn
+        .8s
+        cubic-bezier(.16,1,.3,1)
+        .85s
+        forwards,
+
+        arrowFloat
+        2.5s
+        ease-in-out
+        1.5s
+        infinite;
+}
+
+
+@keyframes arrowIn {
+
+    0% {
+
+        opacity: 0;
+
+        transform:
+            scale(.35)
+            rotate(-35deg);
+    }
+
+    70% {
+
+        opacity: 1;
+
+        transform:
+            scale(1.07)
+            rotate(3deg);
+    }
+
+    100% {
+
+        opacity: 1;
+
+        transform:
+            scale(1)
+            rotate(0deg);
+    }
+}
+
+
+@keyframes arrowFloat {
+
+    0%,
+    100% {
+
+        transform:
+            translateY(0);
+    }
+
+    50% {
+
+        transform:
+            translateY(-5px);
+    }
+}
+
+
+/* ==================================================
+   H.I.D.E.A. LETTERS
+================================================== */
+
+.letter {
+
+    opacity: 0;
+
+    filter:
+        blur(7px);
+
+    fill:
+        var(--primary);
+
+    animation:
+        letterFloatIn
+        .9s
+        cubic-bezier(.16,1,.3,1)
+        forwards;
+}
+
+
+.l1 { animation-delay: 1.45s; }
+.l2 { animation-delay: 1.58s; }
+.l3 { animation-delay: 1.71s; }
+.l4 { animation-delay: 1.84s; }
+.l5 { animation-delay: 1.97s; }
+.l6 { animation-delay: 2.10s; }
+.l7 { animation-delay: 2.23s; }
+.l8 { animation-delay: 2.36s; }
+.l9 { animation-delay: 2.49s; }
+
+
+@keyframes letterFloatIn {
+
+    0% {
+
+        opacity: 0;
+
+        filter:
+            blur(7px);
+
+        transform:
+            translateY(20px)
+            scale(.82);
+    }
+
+    55% {
+
+        opacity: 1;
+
+        filter:
+            blur(1px);
+
+        transform:
+            translateY(-4px)
+            scale(1.04);
+    }
+
+    100% {
+
+        opacity: 1;
+
+        filter:
+            blur(0);
+
+        transform:
+            translateY(0)
+            scale(1);
+    }
+}
+
+
+/* ==================================================
+   SPLASH EXIT
+================================================== */
+
+@keyframes splashOut {
+
+    to {
+
+        opacity: 0;
+
+        visibility: hidden;
+    }
+}
+
+
+/* ==================================================
+   MAIN APP
+================================================== */
+
+#app {
+
+    position: fixed;
+
+    inset: 0;
+
+    width: 100vw;
+    height: 100vh;
+
+    background:
+        var(--background);
+
+    opacity: 0;
+
+    animation:
+        appIn
+        .7s
+        ease
+        4.85s
+        forwards;
+
+    transition:
+        background .25s ease;
+}
+
+
+@keyframes appIn {
+
+    to {
+
+        opacity: 1;
+    }
+}
+
+
+/* ==================================================
+   GRID BACKDROP (default — no network tile fetching,
+   just a panning grid that proves you're moving)
+================================================== */
+
+#grid {
+
+    position: absolute;
+
+    inset: 0;
+
+    z-index: 0;
+
+    background-color:
+        var(--background);
+
+    background-image:
+        linear-gradient(
+            var(--border) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            var(--border) 1px,
+            transparent 1px
+        );
+
+    background-size:
+        44px 44px;
+
+    background-position:
+        0px 0px;
+
+    opacity: .45;
+
+    transition:
+        opacity .2s ease;
+}
+
+
+/* ==================================================
+   LIVE MAP (optional — real OpenStreetMap tiles,
+   only fetched once the user switches it on)
+================================================== */
+
+#map {
+
+    position: absolute;
+
+    inset: 0;
+
+    z-index: 0;
+
+    background:
+        var(--background);
+
+    display: none;
+}
+
+
+#app.map-mode #map {
+
+    display: block;
+}
+
+
+#app.map-mode #grid {
+
+    display: none;
+}
+
+
+/* mono-tone the tiles so the map matches the
+   grayscale H.I.D.E.A. look */
+#map .leaflet-tile-pane {
+
+    filter:
+        grayscale(1)
+        contrast(1.05)
+        brightness(1.02);
+}
+
+
+@media (prefers-color-scheme: dark) {
+
+    #map .leaflet-tile-pane {
+
+        filter:
+            grayscale(1)
+            contrast(1.05)
+            brightness(.55)
+            invert(1)
+            hue-rotate(180deg);
+    }
+}
+
+
+/* ==================================================
+   MAP TOGGLE BUTTON
+================================================== */
+
+.map-toggle {
+
+    position: absolute;
+
+    top:
+        calc(
+            18px +
+            env(safe-area-inset-top)
+        );
+
+    left:
+        calc(
+            18px +
+            env(safe-area-inset-left)
+        );
+
+    z-index: 3;
+
+    height: 34px;
+
+    padding: 0 14px;
+
+    border-radius: 17px;
+
+    border:
+        1px solid
+        var(--border);
+
+    background:
+        color-mix(
+            in srgb,
+            var(--button-background) 80%,
+            transparent
+        );
+
+    backdrop-filter:
+        blur(10px);
+
+    -webkit-backdrop-filter:
+        blur(10px);
+
+    box-shadow:
+        0 3px 12px
+        rgba(0,0,0,.14);
+
+    color:
+        var(--text);
+
+    font-family:
+        var(--font-heading);
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+    letter-spacing: .4px;
+
+    cursor: pointer;
+
+    transition:
+        transform .12s ease;
+}
+
+
+.map-toggle:active {
+
+    transform:
+        scale(.95);
+}
+
+
+/* ==================================================
+   RECENTER BUTTON (appears once you've dragged
+   the map away from your live position)
+================================================== */
+
+.recenter-btn {
+
+    position: absolute;
+
+    top:
+        calc(
+            18px +
+            env(safe-area-inset-top)
+        );
+
+    left: 50%;
+
+    transform:
+        translateX(-50%)
+        scale(.85);
+
+    z-index: 3;
+
+    height: 34px;
+
+    padding: 0 16px;
+
+    border-radius: 17px;
+
+    border:
+        1px solid
+        var(--border);
+
+    background:
+        color-mix(
+            in srgb,
+            var(--button-background) 80%,
+            transparent
+        );
+
+    backdrop-filter:
+        blur(10px);
+
+    -webkit-backdrop-filter:
+        blur(10px);
+
+    box-shadow:
+        0 3px 12px
+        rgba(0,0,0,.16);
+
+    color:
+        var(--blue);
+
+    font-family:
+        var(--font-heading);
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+    letter-spacing: .4px;
+
+    cursor: pointer;
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    transition:
+        opacity .18s ease,
+        transform .18s ease;
+}
+
+
+.recenter-btn.visible {
+
+    opacity: 1;
+
+    pointer-events: auto;
+
+    transform:
+        translateX(-50%)
+        scale(1);
+}
+
+
+#app > *:not(#map):not(#grid):not(#gridPlayers) {
+
+    position: absolute;
+
+    z-index: 1;
+}
+
+
+.location-marker,
+.player-name,
+.altitude,
+.map-toggle {
+
+    z-index: 2;
+}
+
+
+/* ==================================================
+   AVATAR SYSTEM (shared visual language for every
+   player — self and everyone else — used on both
+   the grid backdrop and the real map)
+================================================== */
+
+.avatar-badge {
+
+    position: relative;
+
+    width: 40px;
+    height: 40px;
+
+    transform:
+        translate(-50%, -50%);
+}
+
+
+.avatar-circle {
+
+    position: absolute;
+
+    left: 50%;
+
+    top: 50%;
+
+    width: 30px;
+    height: 30px;
+
+    transform:
+        translate(-50%, -50%);
+
+    border-radius: 50%;
+
+    background:
+        var(--avatar-color, var(--blue));
+
+    border:
+        2.5px solid
+        var(--background);
+
+    box-shadow:
+        0 2px 6px
+        rgba(0,0,0,.25);
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    color: #fff;
+
+    font-family:
+        var(--font-heading);
+
+    font-weight: 700;
+
+    font-size: 12px;
+
+    letter-spacing: .2px;
+}
+
+
+.avatar-pointer {
+
+    position: absolute;
+
+    left: 50%;
+
+    top: -3px;
+
+    width: 0;
+    height: 0;
+
+    transform-origin:
+        50% 23px;
+
+    border-left:
+        4.5px solid transparent;
+
+    border-right:
+        4.5px solid transparent;
+
+    border-bottom:
+        10px solid
+        var(--avatar-color, var(--blue));
+
+    filter:
+        drop-shadow(
+            0 1px 1px
+            rgba(0,0,0,.2)
+        );
+}
+
+
+.avatar-name {
+
+    position: absolute;
+
+    left: 50%;
+
+    top: -6px;
+
+    transform:
+        translate(-50%, -100%);
+
+    color:
+        var(--text);
+
+    font-family:
+        var(--font-heading);
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+    white-space: nowrap;
+
+    background:
+        color-mix(
+            in srgb,
+            var(--background) 80%,
+            transparent
+        );
+
+    padding: 2px 7px;
+
+    border-radius: 7px;
+
+    box-shadow:
+        0 1px 3px
+        rgba(0,0,0,.12);
+}
+
+
+/* container for other players rendered directly
+   on the grid backdrop (non-map mode) */
+#gridPlayers {
+
+    position: absolute;
+
+    inset: 0;
+
+    z-index: 1;
+
+    pointer-events: none;
+}
+
+
+#gridPlayers .avatar-badge {
+
+    position: absolute;
+}
+
+
+/* ==================================================
+   GAME CODE (join / create a shared session)
+================================================== */
+
+.gamecode-row {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    margin-bottom: 22px;
+}
+
+
+#gameCode {
+
+    width: 140px;
+
+    height: 44px;
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius: 11px;
+
+    outline: none;
+
+    background:
+        var(--button-background);
+
+    color:
+        var(--text);
+
+    text-align: center;
+
+    text-transform: uppercase;
+
+    letter-spacing: 2px;
+
+    font-size: 15px;
+}
+
+
+.rooms-btn {
+
+    height: 44px;
+
+    padding: 0 14px;
+
+    border: 1px solid var(--border);
+
+    border-radius: 11px;
+
+    background:
+        var(--button-background);
+
+    color:
+        var(--text);
+
+    font-family:
+        var(--font-heading);
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    letter-spacing: .3px;
+
+    cursor: pointer;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 6px;
+
+    white-space: nowrap;
+
+    transition:
+        transform .12s ease;
+}
+
+
+.rooms-btn:active {
+
+    transform:
+        scale(.95);
+}
+
+
+.gamecode-hint {
+
+    color:
+        var(--muted);
+
+    font-size: 11px;
+
+    margin-top: -14px;
+
+    margin-bottom: 22px;
+    text-align: center;
+    max-width: 280px;
+}
+
+
+/* ==================================================
+   SETUP
+================================================== */
+
+#setup {
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 200;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background:
+        var(--background);
+
+    transition:
+        background .25s ease;
+}
+
+
+.setup-title {
+
+    font-size: 29px;
+
+    font-weight: 600;
+
+    letter-spacing: 1px;
+
+    margin-bottom: 7px;
+}
+
+
+.setup-subtitle {
+
+    color:
+        var(--muted);
+
+    font-size: 13px;
+
+    margin-bottom: 25px;
+}
+
+
+#username {
+
+    width: 280px;
+
+    height: 48px;
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius: 11px;
+
+    outline: none;
+
+    background:
+        var(--button-background);
+
+    color:
+        var(--text);
+
+    text-align: center;
+
+    font-size: 16px;
+
+    margin-bottom: 22px;
+}
+
+
+/* ==================================================
+   COLOUR CHOOSER
+================================================== */
+
+.colors {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 12px;
+
+    margin-bottom: 25px;
+}
+
+
+.color {
+
+    width: 27px;
+    height: 27px;
+
+    padding: 0;
+
+    border-radius: 50%;
+
+    border:
+        2px solid
+        transparent;
+
+    cursor: pointer;
+}
+
+
+.color.selected {
+
+    border-color:
+        var(--text);
+
+    transform:
+        scale(1.12);
+}
+
+
+.color1 {
+    background: #4285f4;
+}
+
+.color2 {
+    background: #e53935;
+}
+
+.color3 {
+    background: #43a047;
+}
+
+.color4 {
+    background: #8e44ad;
+}
+
+.color5 {
+    background: #f39c12;
+}
+
+.color6 {
+    background: #00acc1;
+}
+
+
+.custom-color {
+
+    position: relative;
+
+    width: 27px;
+    height: 27px;
+
+    border-radius: 50%;
+
+    border:
+        2px solid
+        var(--muted);
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    color:
+        var(--text);
+
+    font-size: 20px;
+
+    cursor: pointer;
+}
+
+
+.custom-color input {
+
+    position: absolute;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    opacity: 0;
+
+    cursor: pointer;
+}
+
+
+/* ==================================================
+   START BUTTON
+================================================== */
+
+#startButton {
+
+    width: 280px;
+
+    height: 48px;
+
+    border: none;
+
+    border-radius: 11px;
+
+    background:
+        var(--secondary);
+
+    color:
+        var(--background);
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+
+#startButton:active {
+
+    transform:
+        scale(.97);
+}
+
+
+/* ==================================================
+   LOCATION MARKER (self — uses the shared avatar
+   system: circle + initial, heading pointer, name)
+================================================== */
+
+.location-marker {
+
+    position: absolute;
+
+    left: 50%;
+
+    top: 50%;
+
+    width: 56px;
+    height: 56px;
+
+    transform:
+        translate(-50%, -50%);
+}
+
+
+/* ==================================================
+   ACCURACY CIRCLE
+================================================== */
+
+.accuracy {
+
+    position: absolute;
+
+    left: 50%;
+
+    top: 50%;
+
+    width: 56px;
+    height: 56px;
+
+    transform:
+        translate(-50%, -50%);
+
+    border-radius:
+        50%;
+
+    background:
+        color-mix(
+            in srgb,
+            var(--player-color) 6%,
+            transparent
+        );
+
+    border:
+        1px solid
+        color-mix(
+            in srgb,
+            var(--player-color) 15%,
+            transparent
+        );
+
+    transition:
+        width .3s ease,
+        height .3s ease;
+}
+
+
+/* ==================================================
+   EXPLORER HEADING POINTER
+================================================== */
+
+.heading {
+
+    position: absolute;
+
+    left: 50%;
+
+    top: 3px;
+
+    width: 0;
+    height: 0;
+
+    transform:
+        translateX(-50%);
+
+    transform-origin:
+        50% 25px;
+
+    border-left:
+        5px solid transparent;
+
+    border-right:
+        5px solid transparent;
+
+    border-bottom:
+        14px solid
+        var(--player-color);
+
+    filter:
+        drop-shadow(
+            0 1px 2px
+            rgba(0,0,0,.15)
+        );
+
+    transition:
+        transform .12s linear;
+}
+
+
+/* ==================================================
+   SELF AVATAR CIRCLE
+================================================== */
+
+.self-avatar {
+
+    position: absolute;
+
+    left: 50%;
+
+    top: 50%;
+
+    width: 30px;
+    height: 30px;
+
+    transform:
+        translate(-50%, -50%);
+
+    border-radius: 50%;
+
+    background:
+        var(--player-color);
+
+    border:
+        2.5px solid
+        var(--background);
+
+    box-shadow:
+        0 2px 6px
+        rgba(0,0,0,.25),
+        0 0 0 0
+        color-mix(
+            in srgb,
+            var(--player-color) 45%,
+            transparent
+        );
+
+    animation:
+        avatarPulse
+        2.4s
+        ease-out
+        infinite;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    color: #fff;
+
+    font-family:
+        var(--font-heading);
+
+    font-weight: 700;
+
+    font-size: 12px;
+
+    z-index: 2;
+}
+
+
+@keyframes avatarPulse {
+
+    0% {
+
+        box-shadow:
+            0 2px 6px
+            rgba(0,0,0,.25),
+            0 0 0 0
+            color-mix(
+                in srgb,
+                var(--player-color) 45%,
+                transparent
+            );
+    }
+
+    70% {
+
+        box-shadow:
+            0 2px 6px
+            rgba(0,0,0,.25),
+            0 0 0 14px
+            color-mix(
+                in srgb,
+                var(--player-color) 0%,
+                transparent
+            );
+    }
+
+    100% {
+
+        box-shadow:
+            0 2px 6px
+            rgba(0,0,0,.25),
+            0 0 0 0
+            color-mix(
+                in srgb,
+                var(--player-color) 0%,
+                transparent
+            );
+    }
+}
+
+
+/* ==================================================
+   USERNAME
+================================================== */
+
+.player-name {
+
+    position: absolute;
+
+    left: 50%;
+
+    top: calc(50% - 52px);
+
+    transform:
+        translate(-50%, -100%);
+
+    color:
+        var(--text);
+
+    font-family:
+        var(--font-heading);
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    letter-spacing: .3px;
+
+    white-space: nowrap;
+
+    background:
+        color-mix(
+            in srgb,
+            var(--background) 80%,
+            transparent
+        );
+
+    padding: 2px 8px;
+
+    border-radius: 7px;
+
+    text-align: center;
+
+    z-index: 10;
+}
+
+
+/* ==================================================
+   GAME CODE BADGE (always visible so friends
+   know what to type in to join you)
+================================================== */
+
+.gamecode-badge {
+
+    position: absolute;
+
+    bottom:
+        calc(
+            22px +
+            env(safe-area-inset-bottom)
+        );
+
+    left: 50%;
+
+    transform:
+        translateX(-50%);
+
+    z-index: 3;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    height: 34px;
+
+    padding: 0 14px;
+
+    border-radius: 17px;
+
+    border:
+        1px solid
+        var(--border);
+
+    background:
+        color-mix(
+            in srgb,
+            var(--button-background) 80%,
+            transparent
+        );
+
+    backdrop-filter:
+        blur(10px);
+
+    -webkit-backdrop-filter:
+        blur(10px);
+
+    box-shadow:
+        0 3px 14px
+        rgba(0,0,0,.16);
+
+    cursor: pointer;
+
+    transition:
+        transform .12s ease;
+}
+
+
+.gamecode-badge:active {
+
+    transform:
+        translateX(-50%)
+        scale(.96);
+}
+
+
+.gamecode-badge .gc-label {
+
+    font-family:
+        var(--font-heading);
+
+    font-size: 9px;
+
+    letter-spacing: .6px;
+
+    color:
+        var(--muted);
+}
+
+
+.gamecode-badge .gc-value {
+
+    font-family:
+        var(--font-mono);
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    letter-spacing: 1.5px;
+
+    color:
+        var(--text);
+}
+
+
+/* ==================================================
+   ADMIN
+================================================== */
+
+.admin-btn {
+
+    position: absolute;
+
+    top:
+        calc(
+            60px +
+            env(safe-area-inset-top)
+        );
+
+    left:
+        calc(
+            18px +
+            env(safe-area-inset-left)
+        );
+
+    z-index: 3;
+
+    height: 34px;
+
+    padding: 0 14px;
+
+    border-radius: 17px;
+
+    border:
+        1px solid
+        var(--blue);
+
+    background:
+        var(--blue);
+
+    color: #fff;
+
+    font-family:
+        var(--font-heading);
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    letter-spacing: .4px;
+
+    cursor: pointer;
+
+    display: none;
+
+    align-items: center;
+
+    justify-content: center;
+}
+
+
+.admin-panel {
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 600;
+
+    display: none;
+
+    align-items: flex-end;
+
+    justify-content: center;
+
+    background:
+        rgba(0,0,0,.4);
+}
+
+
+.admin-panel.open {
+
+    display: flex;
+}
+
+
+.admin-panel-inner {
+
+    width: 100%;
+
+    max-width: 480px;
+
+    max-height: 72vh;
+
+    background:
+        var(--background);
+
+    border-radius: 18px 18px 0 0;
+
+    padding: 16px 16px
+        calc(16px + env(safe-area-inset-bottom));
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+}
+
+
+.admin-panel-header {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    font-family:
+        var(--font-heading);
+
+    font-size: 15px;
+
+    font-weight: 700;
+
+    color:
+        var(--text);
+}
+
+
+.admin-panel-header button {
+
+    width: 30px;
+    height: 30px;
+
+    border-radius: 50%;
+
+    border:
+        1px solid
+        var(--border);
+
+    background:
+        var(--button-background);
+
+    color:
+        var(--text);
+
+    font-size: 14px;
+
+    cursor: pointer;
+}
+
+
+.admin-room-list {
+
+    overflow-y: auto;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+}
+
+
+.admin-room-row {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 10px;
+
+    padding: 10px 12px;
+
+    border: 1px solid var(--border);
+
+    border-radius: 12px;
+}
+
+
+.admin-room-row .arr-info {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 2px;
+}
+
+
+.admin-room-row .arr-code {
+
+    font-family:
+        var(--font-mono);
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+    letter-spacing: 1px;
+
+    color:
+        var(--text);
+}
+
+
+.admin-room-row .arr-count {
+
+    font-size: 11px;
+
+    color:
+        var(--muted);
+}
+
+
+.admin-room-row .arr-buttons {
+
+    display: flex;
+
+    gap: 6px;
+}
+
+
+.admin-room-row button {
+
+    height: 30px;
+
+    padding: 0 12px;
+
+    border-radius: 15px;
+
+    border: none;
+
+    font-family:
+        var(--font-heading);
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+
+.admin-room-row .arr-join {
+
+    background:
+        var(--blue);
+
+    color: #fff;
+}
+
+
+.admin-room-row .arr-delete {
+
+    background:
+        var(--error);
+
+    color: #fff;
+}
+
+
+.admin-room-row .arr-players {
+
+    width: 30px;
+
+    padding: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background:
+        var(--button-background);
+
+    border:
+        1px solid
+        var(--border);
+
+    color:
+        var(--text);
+}
+
+
+.arr-player-list {
+
+    flex-direction: column;
+
+    gap: 6px;
+
+    padding: 4px 12px 10px 12px;
+}
+
+
+.arr-player-row {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding: 7px 10px;
+
+    background:
+        color-mix(
+            in srgb,
+            var(--border) 25%,
+            transparent
+        );
+
+    border-radius: 9px;
+}
+
+
+.arr-player-name {
+
+    font-family:
+        var(--font-heading);
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    color:
+        var(--text);
+}
+
+
+.arr-kick {
+
+    height: 26px;
+
+    padding: 0 11px;
+
+    border-radius: 13px;
+
+    border: none;
+
+    background:
+        var(--error);
+
+    color: #fff;
+
+    font-family:
+        var(--font-heading);
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+
+.admin-room-empty {
+
+    color:
+        var(--muted);
+
+    font-size: 13px;
+
+    text-align: center;
+
+    padding: 20px 0;
+}
+
+
+/* ==================================================
+   ALTITUDE
+================================================== */
+
+.altitude {
+
+    position: absolute;
+
+    top:
+        calc(
+            18px +
+            env(safe-area-inset-top)
+        );
+
+    right:
+        calc(
+            18px +
+            env(safe-area-inset-right)
+        );
+
+    text-align:
+        right;
+}
+
+
+.altitude-label {
+
+    font-size:
+        9px;
+
+    letter-spacing:
+        .9px;
+
+    color:
+        var(--muted);
+}
+
+
+.altitude-value {
+
+    margin-top:
+        2px;
+
+    font-size:
+        18px;
+
+    font-weight:
+        600;
+
+    color:
+        var(--secondary);
+}
+
+
+/* ==================================================
+   ERROR SCREEN
+================================================== */
+
+#error {
+
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 500;
+
+    display: none;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    flex-direction:
+        column;
+
+    background:
+        var(--background);
+
+    text-align:
+        center;
+
+    padding:
+        30px;
+}
+
+
+.wifi {
+
+    width:
+        96px;
+
+    height:
+        96px;
+
+    margin-bottom:
+        22px;
+}
+
+
+#errorText {
+
+    color:
+        var(--error);
+
+    font-size:
+        30px;
+
+    font-weight:
+        600;
+
+    margin-bottom:
+        26px;
+}
+
+
+.error-buttons {
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    gap:
+        12px;
+
+    width:
+        min(280px, 82vw);
+}
+
+
+.error-button {
+
+    width:
+        100%;
+
+    min-height:
+        50px;
+
+    padding:
+        0 16px;
+
+    border-radius:
+        12px;
+
+    border:
+        1px solid
+        var(--border);
+
+    background:
+        var(--button-background);
+
+    color:
+        var(--secondary);
+
+    font-size:
+        16px;
+
+    font-weight:
+        600;
+
+    cursor:
+        pointer;
+}
+
+
+.error-button.primary {
+
+    background:
+        var(--secondary);
+
+    color:
+        var(--background);
+
+    border:
+        none;
+}
+
+
+#errorHelp {
+
+    margin-top:
+        17px;
+
+    max-width:
+        300px;
+
+    color:
+        var(--muted);
+
+    font-size:
+        12px;
+
+    line-height:
+        1.5;
+}
+
+</style>
+
+
+<!-- Leaflet (map tiles) -->
+<link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- Firebase (shared multiplayer positions) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+</head>
+
+
+<body>
+
+
+<!-- ==================================================
+     SPLASH SCREEN
+================================================== -->
+
+<div id="splash">
+
+<svg
+    class="logo"
+    viewBox="0 0 500 570"
+    xmlns="http://www.w3.org/2000/svg"
+>
+
+
+<!-- GLOBE -->
+
+<g class="globe">
+
+    <circle
+        cx="250"
+        cy="225"
+        r="150"
+        fill="var(--background)"
+        stroke="var(--primary)"
+        stroke-width="7"
+    />
+
+</g>
+
+
+<!-- GLOBE LINES -->
+
+<g
+    class="globeLines"
+    fill="none"
+    stroke="var(--globe-line)"
+    stroke-width="2"
+>
+
+    <ellipse
+        cx="250"
+        cy="285"
+        rx="105"
+        ry="35"
+    />
+
+    <ellipse
+        cx="250"
+        cy="285"
+        rx="50"
+        ry="35"
+    />
+
+    <path
+        d="M145 285 Q250 250 355 285"
+    />
+
+    <path
+        d="M150 300 Q250 330 350 300"
+    />
+
+    <path
+        d="M250 250 Q215 285 250 320"
+    />
+
+    <path
+        d="M250 250 Q285 285 250 320"
+    />
+
+</g>
+
+
+<!-- EAST -->
+
+<g
+    class="cardinal east"
+    stroke-width="5"
+    stroke-linecap="round"
+>
+
+    <line
+        x1="405"
+        y1="225"
+        x2="387"
+        y2="225"
+    />
+
+</g>
+
+
+<!-- SOUTH -->
+
+<g
+    class="cardinal south"
+    stroke-width="5"
+    stroke-linecap="round"
+>
+
+    <line
+        x1="250"
+        y1="380"
+        x2="250"
+        y2="362"
+    />
+
+</g>
+
+
+<!-- WEST -->
+
+<g
+    class="cardinal west"
+    stroke-width="5"
+    stroke-linecap="round"
+>
+
+    <line
+        x1="95"
+        y1="225"
+        x2="113"
+        y2="225"
+    />
+
+</g>
+
+
+<!-- NORTH ARROW -->
+
+<g class="navArrow">
+
+    <path
+        d="
+        M250 125
+        L315 300
+        L250 260
+        L185 300
+        Z
+        "
+        fill="var(--blue-light)"
+    />
+
+    <path
+        d="
+        M250 125
+        L315 300
+        L250 260
+        Z
+        "
+        fill="var(--blue-dark)"
+    />
+
+    <path
+        d="
+        M250 55
+        L261 92
+        L250 108
+        L239 92
+        Z
+        "
+        fill="var(--primary)"
+    />
+
+</g>
+
+
+<!-- H.I.D.E.A. -->
+
+<g
+    text-anchor="middle"
+    font-family="Arial, Helvetica, sans-serif"
+    font-size="62"
+    font-weight="500"
+>
+
+    <text
+        class="letter l1"
+        x="95"
+        y="475"
+    >H</text>
+
+    <text
+        class="letter l2"
+        x="135"
+        y="475"
+    >.</text>
+
+    <text
+        class="letter l3"
+        x="165"
+        y="475"
+    >I</text>
+
+    <text
+        class="letter l4"
+        x="195"
+        y="475"
+    >.</text>
+
+    <text
+        class="letter l5"
+        x="235"
+        y="475"
+    >D</text>
+
+    <text
+        class="letter l6"
+        x="285"
+        y="475"
+    >.</text>
+
+    <text
+        class="letter l7"
+        x="325"
+        y="475"
+    >E</text>
+
+    <text
+        class="letter l8"
+        x="370"
+        y="475"
+    >.</text>
+
+    <text
+        class="letter l9"
+        x="410"
+        y="475"
+    >A</text>
+
+</g>
+
+</svg>
+
+</div>
+
+
+<!-- ==================================================
+     SETUP
+================================================== -->
+
+<div id="setup">
+
+    <div class="setup-title">
+        H.I.D.E.A.
+    </div>
+
+    <div class="setup-subtitle">
+        Choose your explorer
+    </div>
+
+
+    <input
+        id="username"
+        type="text"
+        maxlength="16"
+        placeholder="Username"
+        autocomplete="off"
+    >
+
+
+    <div class="gamecode-row">
+
+        <input
+            id="gameCode"
+            type="text"
+            maxlength="6"
+            placeholder="GAME CODE"
+            autocomplete="off"
+        >
+
+        <button
+            id="newCodeButton"
+            class="rooms-btn"
+            title="Browse open rooms">
+
+            <svg
+                viewBox="0 0 24 24"
+                width="16"
+                height="16"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round">
+
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+
+            </svg>
+
+            ROOMS
+
+        </button>
+
+    </div>
+
+    <div class="gamecode-hint">
+        Share this code with friends, or
+        tap ROOMS to browse open games.
+    </div>
+
+
+    <div class="colors">
+
+        <button
+            class="color color1 selected"
+            data-color="#4285F4">
+        </button>
+
+        <button
+            class="color color2"
+            data-color="#E53935">
+        </button>
+
+        <button
+            class="color color3"
+            data-color="#43A047">
+        </button>
+
+        <button
+            class="color color4"
+            data-color="#8E44AD">
+        </button>
+
+        <button
+            class="color color5"
+            data-color="#F39C12">
+        </button>
+
+        <button
+            class="color color6"
+            data-color="#00ACC1">
+        </button>
+
+
+        <label
+            class="custom-color"
+            id="customColor">
+
+            +
+
+            <input
+                id="colorPicker"
+                type="color"
+                value="#4285F4"
+            >
+
+        </label>
+
+    </div>
+
+
+    <button id="startButton">
+        Continue
+    </button>
+
+</div>
+
+
+<!-- ==================================================
+     MAIN APP
+================================================== -->
+
+<div id="app">
+
+
+    <div id="grid"></div>
+
+    <div id="map"></div>
+
+    <div id="gridPlayers"></div>
+
+    <button
+        class="map-toggle"
+        id="mapToggle">
+        SHOW MAP
+    </button>
+
+    <button
+        class="recenter-btn"
+        id="recenterBtn">
+        RECENTER
+    </button>
+
+
+    <div class="player-name"
+         id="playerName">
+    </div>
+
+
+    <div
+        class="accuracy"
+        id="accuracyCircle">
+    </div>
+
+
+    <div class="location-marker">
+
+        <div
+            class="heading"
+            id="heading">
+        </div>
+
+        <div
+            class="self-avatar"
+            id="selfAvatar">
+        </div>
+
+    </div>
+
+
+    <div class="altitude">
+
+        <div class="altitude-label">
+            ALT
+        </div>
+
+        <div
+            class="altitude-value"
+            id="altitude">
+            --
+        </div>
+
+    </div>
+
+
+    <div
+        class="gamecode-badge"
+        id="gameCodeBadge">
+
+        <span class="gc-label">
+            GAME CODE
+        </span>
+
+        <span
+            class="gc-value"
+            id="gameCodeValue">
+            ------
+        </span>
+
+    </div>
+
+
+    <button
+        class="admin-btn"
+        id="adminBtn"
+        style="display:none;">
+        ADMIN
+    </button>
+
+
+</div>
+
+
+<!-- ==================================================
+     ADMIN PANEL
+================================================== -->
+
+<div
+    id="adminPanel"
+    class="admin-panel">
+
+    <div class="admin-panel-inner">
+
+        <div class="admin-panel-header">
+
+            <span>Game Rooms</span>
+
+            <button id="adminCloseBtn">
+                ✕
+            </button>
+
+        </div>
+
+        <div
+            id="adminRoomList"
+            class="admin-room-list">
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ==================================================
+     LOCATION ERROR
+================================================== -->
+
+<div id="error">
+
+
+<svg
+    class="wifi"
+    viewBox="0 0 100 100"
+    xmlns="http://www.w3.org/2000/svg"
+>
+
+    <path
+        d="M10 35 Q50 5 90 35"
+        fill="none"
+        stroke="var(--error)"
+        stroke-width="10"
+        stroke-linecap="round"
+    />
+
+    <path
+        d="M23 52 Q50 30 77 52"
+        fill="none"
+        stroke="var(--error)"
+        stroke-width="10"
+        stroke-linecap="round"
+    />
+
+    <path
+        d="M37 69 Q50 58 63 69"
+        fill="none"
+        stroke="var(--error)"
+        stroke-width="10"
+        stroke-linecap="round"
+    />
+
+    <circle
+        cx="50"
+        cy="84"
+        r="6"
+        fill="var(--error)"
+    />
+
+    <line
+        x1="18"
+        y1="15"
+        x2="82"
+        y2="85"
+        stroke="var(--error)"
+        stroke-width="9"
+        stroke-linecap="round"
+    />
+
+</svg>
+
+
+<div id="errorText">
+    Location unavailable
+</div>
+
+
+<div class="error-buttons">
+
+    <button
+        class="error-button primary"
+        id="allowButton">
+        Allow Location
+    </button>
+
+    <button
+        class="error-button"
+        id="settingsButton">
+        Open Location Settings
+    </button>
+
+</div>
+
+
+<div id="errorHelp">
+    Location permission is required
+    for H.I.D.E.A. to determine your
+    position.
+</div>
+
+
+</div>
+
+
+<script>
+
+/* ==================================================
+   VARIABLES
+================================================== */
+
+let locationWatch = null;
+
+let compassStarted = false;
+
+let lastHeadingDeg = 0;
+
+let selectedColor =
+    localStorage.getItem(
+        "hidea_color"
+    ) || "#4285F4";
+
+
+/* multiplayer state */
+
+let leafletMap = null;
+
+let mapReady = false;
+
+let mapModeOn = false;
+
+let othersLayer = {};
+
+let othersGridEls = {};
+
+let db = null;
+
+let playersRef = null;
+
+let myGameCode = "";
+
+
+/* grid-panning state (dead-reckoning, no network) */
+
+let gridOriginLat = null;
+
+let gridOriginLng = null;
+
+const GRID_PX_PER_METER = 3;
+
+
+/* live tracking used to place other players */
+
+let myLastLat = null;
+
+let myLastLng = null;
+
+let followMe = true;
+
+let lastPlayersSnapshot = {};
+
+let selfMapMarker = null;
+
+
+/* admin */
+
+const ADMIN_KEY = "arceas@7118";
+
+let isAdmin = false;
+
+let adminRoomsRef = null;
+
+let roomBrowserMode = "admin";
+
+
+const myUid =
+    localStorage.getItem("hidea_uid")
+    ||
+    (function() {
+
+        const id =
+            "p_" +
+            Math.random()
+                .toString(36)
+                .slice(2, 10);
+
+        localStorage.setItem(
+            "hidea_uid",
+            id
+        );
+
+        return id;
+
+    })();
+
+
+/* ==================================================
+   FIREBASE CONFIG (your H.I.D.E.A. project)
+================================================== */
+
+const firebaseConfig = {
+
+    apiKey: "AIzaSyA0-JgbV4EFVihCG0jaw-QnazjZudJVYJc",
+    authDomain: "hidea-e453d.firebaseapp.com",
+    databaseURL: "https://hidea-e453d-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "hidea-e453d",
+    storageBucket: "hidea-e453d.firebasestorage.app",
+    messagingSenderId: "1027814932968",
+    appId: "1:1027814932968:web:d3ddd4db0f69293c31a45d"
+
+};
+
+
+try {
+
+    firebase.initializeApp(firebaseConfig);
+
+    db = firebase.database();
+
+}
+
+catch (e) {
+
+    console.warn(
+        "Firebase not configured yet — multiplayer disabled.",
+        e
+    );
+
+}
+
+
+/* ==================================================
+   ELEMENTS
+================================================== */
+
+const setup =
+    document.getElementById("setup");
+
+const app =
+    document.getElementById("app");
+
+const error =
+    document.getElementById("error");
+
+const username =
+    document.getElementById("username");
+
+const playerName =
+    document.getElementById("playerName");
+
+const heading =
+    document.getElementById("heading");
+
+const gameCodeInput =
+    document.getElementById("gameCode");
+
+const newCodeButton =
+    document.getElementById("newCodeButton");
+
+const mapToggle =
+    document.getElementById("mapToggle");
+
+const recenterBtn =
+    document.getElementById("recenterBtn");
+
+const selfAvatar =
+    document.getElementById("selfAvatar");
+
+const gameCodeValue =
+    document.getElementById("gameCodeValue");
+
+const gameCodeBadge =
+    document.getElementById("gameCodeBadge");
+
+const gridPlayersEl =
+    document.getElementById("gridPlayers");
+
+const adminBtn =
+    document.getElementById("adminBtn");
+
+const adminPanel =
+    document.getElementById("adminPanel");
+
+const adminCloseBtn =
+    document.getElementById("adminCloseBtn");
+
+const adminRoomList =
+    document.getElementById("adminRoomList");
+
+
+/* ==================================================
+   LOAD SAVED USERNAME / GAME CODE
+================================================== */
+
+username.value =
+    localStorage.getItem(
+        "hidea_username"
+    ) || "";
+
+
+gameCodeInput.value =
+    localStorage.getItem(
+        "hidea_gamecode"
+    ) || makeGameCode();
+
+
+mapModeOn =
+    localStorage.getItem(
+        "hidea_mapmode"
+    ) === "1";
+
+app.classList.toggle(
+    "map-mode",
+    mapModeOn
+);
+
+mapToggle.textContent =
+    mapModeOn ? "HIDE MAP" : "SHOW MAP";
+
+
+/* ==================================================
+   GAME CODE HELPERS
+================================================== */
+
+function makeGameCode() {
+
+    const chars =
+        "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+
+    let code = "";
+
+    for (let i = 0; i < 5; i++) {
+
+        code +=
+            chars[
+                Math.floor(
+                    Math.random() * chars.length
+                )
+            ];
+    }
+
+    return code;
+}
+
+
+/* opens the public room browser — anyone can see
+   which games are open, before they even join one */
+newCodeButton.addEventListener(
+    "click",
+    function() {
+
+        openRoomBrowser("public");
+
+    }
+);
+
+
+/* pressing Enter in either field submits, since
+   that's what people instinctively try */
+username.addEventListener(
+    "keydown",
+    function(e) {
+
+        if (e.key === "Enter") {
+
+            document
+                .getElementById("startButton")
+                .click();
+        }
+    }
+);
+
+
+gameCodeInput.addEventListener(
+    "keydown",
+    function(e) {
+
+        if (e.key === "Enter") {
+
+            document
+                .getElementById("startButton")
+                .click();
+        }
+    }
+);
+
+
+/* ==================================================
+   APPLY COLOUR
+================================================== */
+
+function applyColor() {
+
+    document.documentElement
+        .style
+        .setProperty(
+            "--player-color",
+            selectedColor
+        );
+
+
+    document
+        .querySelectorAll(".color")
+        .forEach(
+            button => {
+
+                button.classList.toggle(
+                    "selected",
+                    button.dataset.color
+                    .toUpperCase()
+                    ===
+                    selectedColor.toUpperCase()
+                );
+
+            }
+        );
+
+
+    document
+        .getElementById("customColor")
+        .style
+        .borderColor =
+            selectedColor;
+}
+
+
+applyColor();
+
+
+/* ==================================================
+   PRESET COLOURS
+================================================== */
+
+document
+    .querySelectorAll(".color")
+    .forEach(
+        button => {
+
+            button.addEventListener(
+                "click",
+                function() {
+
+                    selectedColor =
+                        this.dataset.color;
+
+                    localStorage.setItem(
+                        "hidea_color",
+                        selectedColor
+                    );
+
+                    applyColor();
+
+                }
+            );
+
+        }
+    );
+
+
+/* ==================================================
+   CUSTOM COLOUR
+================================================== */
+
+document
+    .getElementById("colorPicker")
+    .addEventListener(
+        "input",
+        function() {
+
+            selectedColor =
+                this.value.toUpperCase();
+
+            localStorage.setItem(
+                "hidea_color",
+                selectedColor
+            );
+
+            applyColor();
+
+        }
+    );
+
+
+/* ==================================================
+   START
+================================================== */
+
+document
+    .getElementById("startButton")
+    .addEventListener(
+        "click",
+        function() {
+
+            const name =
+                username.value.trim();
+
+
+            if (!name) {
+
+                username.focus();
+
+                return;
+            }
+
+
+            /* secret admin trigger — the raw string
+               is never shown anywhere, so it never
+               leaks to other players via the map */
+            isAdmin =
+                name === ADMIN_KEY;
+
+            const displayName =
+                isAdmin ? "Admin" : name;
+
+
+            localStorage.setItem(
+                "hidea_username",
+                isAdmin ? "" : name
+            );
+
+
+            myGameCode =
+                (
+                    gameCodeInput.value.trim()
+                    ||
+                    makeGameCode()
+                )
+                .toUpperCase();
+
+            localStorage.setItem(
+                "hidea_gamecode",
+                myGameCode
+            );
+
+
+            playerName.textContent =
+                displayName;
+
+            selfAvatar.textContent =
+                displayName.charAt(0)
+                    .toUpperCase();
+
+            gameCodeValue.textContent =
+                myGameCode;
+
+            adminBtn.style.display =
+                isAdmin ? "flex" : "none";
+
+
+            setup.style.display =
+                "none";
+
+
+            joinGame();
+
+
+            requestLocation();
+
+        }
+    );
+
+
+/* ==================================================
+   SHOW ERROR
+================================================== */
+
+function showLocationError() {
+
+    error.style.display =
+        "flex";
+}
+
+
+/* ==================================================
+   HIDE ERROR
+================================================== */
+
+function hideLocationError() {
+
+    error.style.display =
+        "none";
+}
+
+
+/* ==================================================
+   UPDATE LOCATION
+================================================== */
+
+function updateLocation(position) {
+
+    const c =
+        position.coords;
+
+    const rawAccuracy =
+        Number.isFinite(c.accuracy)
+            ? c.accuracy
+            : 30;
+
+
+    if (
+        c.altitude !== null
+        &&
+        Number.isFinite(
+            c.altitude
+        )
+    ) {
+
+        document.getElementById(
+            "altitude"
+        ).textContent =
+
+            c.altitude.toFixed(1)
+            + " m";
+
+    }
+
+    else {
+
+        document.getElementById(
+            "altitude"
+        ).textContent =
+            "--";
+
+    }
+
+
+    hideLocationError();
+
+
+    /* ---- reject / smooth the fix. Raw GPS fixes
+       jitter by several metres even standing still;
+       we filter that out instead of drawing every
+       raw sample. This can't beat your device's own
+       GPS hardware accuracy, but it stops the on-
+       screen jumpiness that isn't real movement. ---- */
+
+    const filtered =
+        filterPosition(
+            c.latitude,
+            c.longitude,
+            rawAccuracy
+        );
+
+    myLastLat = filtered.lat;
+
+    myLastLng = filtered.lng;
+
+    updateAccuracyCircle(rawAccuracy);
+
+
+    /* ---- move the backdrop so it looks like the
+       world scrolls under you. Grid mode needs no
+       network fetch at all; map mode (opt-in) uses
+       real tiles. ---- */
+
+    if (mapModeOn) {
+
+        if (!mapReady) {
+
+            initMap(myLastLat, myLastLng);
+
+        }
+
+        else if (followMe) {
+
+            leafletMap.panTo(
+                [myLastLat, myLastLng],
+                { animate: true, duration: .4 }
+            );
+
+            hideSelfMapMarker();
+
+        }
+
+        else {
+
+            /* they've dragged away — keep a real
+               marker on the map showing where they
+               actually are, since the fixed centre
+               dot no longer represents that */
+            showSelfMapMarker(
+                myLastLat,
+                myLastLng
+            );
+        }
+    }
+
+    else {
+
+        panGrid(myLastLat, myLastLng);
+    }
+
+
+    /* ---- refresh everyone else's position on
+       screen using the coordinates we just got ---- */
+
+    renderOtherPlayers(lastPlayersSnapshot);
+
+
+    /* ---- push my (smoothed) position to the
+       shared game, so other players see the same
+       jitter-free position we do ---- */
+
+    sendMyPosition({
+        latitude: myLastLat,
+        longitude: myLastLng
+    });
+}
+
+
+/* ==================================================
+   GPS SMOOTHING
+   Blends new fixes toward the previous position
+   instead of snapping to every raw sample, and
+   ignores fixes worse than 75m. The blend weight
+   depends on how confident the new fix is.
+================================================== */
+
+let filteredLat = null;
+
+let filteredLng = null;
+
+
+function filterPosition(lat, lng, accuracy) {
+
+    if (filteredLat === null) {
+
+        filteredLat = lat;
+
+        filteredLng = lng;
+
+        return { lat: lat, lng: lng };
+    }
+
+    /* a fix this bad (patchy signal, indoors, etc.)
+       tells us almost nothing — hold position */
+    if (accuracy > 75) {
+
+        return {
+            lat: filteredLat,
+            lng: filteredLng
+        };
+    }
+
+    const movedMeters =
+        Math.hypot(
+            metersEastWest(
+                filteredLat,
+                filteredLng,
+                lng
+            ),
+            metersNorthSouth(
+                filteredLat,
+                lat
+            )
+        );
+
+    /* GPS noise floor scales with reported accuracy —
+       treat tiny "movement" smaller than that as
+       standing still, not a real step */
+    const noiseFloor =
+        Math.max(accuracy * .5, 3);
+
+    if (movedMeters < noiseFloor) {
+
+        return {
+            lat: filteredLat,
+            lng: filteredLng
+        };
+    }
+
+    /* trust sharper fixes more; blend toward them
+       instead of teleporting straight to them */
+    const alpha =
+        accuracy < 10 ? .9 :
+        accuracy < 25 ? .6 :
+                        .3;
+
+    filteredLat +=
+        (lat - filteredLat) * alpha;
+
+    filteredLng +=
+        (lng - filteredLng) * alpha;
+
+    return {
+        lat: filteredLat,
+        lng: filteredLng
+    };
+}
+
+
+function updateAccuracyCircle(accuracy) {
+
+    const el =
+        document.getElementById(
+            "accuracyCircle"
+        );
+
+    if (!el) {
+
+        return;
+    }
+
+    const px =
+        Math.min(
+            Math.max(
+                accuracy *
+                2 *
+                GRID_PX_PER_METER,
+                40
+            ),
+            260
+        );
+
+    el.style.width = px + "px";
+
+    el.style.height = px + "px";
+}
+
+
+/* ==================================================
+   GRID BACKDROP (default, no tile fetching)
+================================================== */
+
+/* ==================================================
+   SELF MARKER ON THE REAL MAP
+   (only used once the person has dragged away
+   from "follow me" mode)
+================================================== */
+
+function showSelfMapMarker(lat, lng) {
+
+    document.querySelector(
+        ".location-marker"
+    ).style.visibility =
+        "hidden";
+
+    document.getElementById(
+        "playerName"
+    ).style.visibility =
+        "hidden";
+
+    document.getElementById(
+        "accuracyCircle"
+    ).style.visibility =
+        "hidden";
+
+    const icon =
+        L.divIcon({
+            html: avatarHTML(
+                playerName.textContent,
+                selectedColor,
+                lastHeadingDeg
+            ),
+            className: "",
+            iconSize: [40, 40]
+        });
+
+    if (selfMapMarker) {
+
+        selfMapMarker.setLatLng(
+            [lat, lng]
+        );
+
+        selfMapMarker.setIcon(icon);
+
+    }
+
+    else {
+
+        selfMapMarker =
+            L.marker(
+                [lat, lng],
+                { icon: icon }
+            ).addTo(leafletMap);
+    }
+}
+
+
+function hideSelfMapMarker() {
+
+    document.querySelector(
+        ".location-marker"
+    ).style.visibility =
+        "visible";
+
+    document.getElementById(
+        "playerName"
+    ).style.visibility =
+        "visible";
+
+    document.getElementById(
+        "accuracyCircle"
+    ).style.visibility =
+        "visible";
+
+    if (selfMapMarker && leafletMap) {
+
+        leafletMap.removeLayer(
+            selfMapMarker
+        );
+
+        selfMapMarker = null;
+    }
+}
+
+
+function panGrid(lat, lng) {
+
+    const grid =
+        document.getElementById("grid");
+
+    if (!grid) {
+
+        return;
+    }
+
+    if (gridOriginLat === null) {
+
+        gridOriginLat = lat;
+
+        gridOriginLng = lng;
+
+        return;
+    }
+
+    const dx =
+        metersEastWest(
+            gridOriginLat,
+            gridOriginLng,
+            lng
+        );
+
+    const dy =
+        metersNorthSouth(
+            gridOriginLat,
+            lat
+        );
+
+    /* moving north/east should scroll the grid
+       south/west beneath the fixed centre dot */
+    const px =
+        -dx * GRID_PX_PER_METER;
+
+    const py =
+        dy * GRID_PX_PER_METER;
+
+    grid.style.backgroundPosition =
+        px + "px " + py + "px";
+}
+
+
+function metersEastWest(lat, lng1, lng2) {
+
+    const R = 6371000;
+
+    const rad =
+        lat * Math.PI / 180;
+
+    return (
+        (lng2 - lng1) * Math.PI / 180
+    ) * R * Math.cos(rad);
+}
+
+
+function metersNorthSouth(lat1, lat2) {
+
+    const R = 6371000;
+
+    return (
+        (lat2 - lat1) * Math.PI / 180
+    ) * R;
+}
+
+
+/* ==================================================
+   MAP TOGGLE (turns real tile fetching on/off)
+================================================== */
+
+function setMapMode(on) {
+
+    mapModeOn = on;
+
+    app.classList.toggle(
+        "map-mode",
+        on
+    );
+
+    mapToggle.textContent =
+        on ? "HIDE MAP" : "SHOW MAP";
+
+    localStorage.setItem(
+        "hidea_mapmode",
+        on ? "1" : "0"
+    );
+
+
+    /* grid mode has no concept of dragging away,
+       so always reset to "following" when we
+       leave the real map */
+    followMe = true;
+
+    recenterBtn.classList.remove(
+        "visible"
+    );
+
+    hideSelfMapMarker();
+
+
+    if (on) {
+
+        if (
+            !mapReady &&
+            myLastLat !== null
+        ) {
+
+            initMap(myLastLat, myLastLng);
+
+        }
+
+        else {
+
+            renderOtherPlayers(
+                lastPlayersSnapshot
+            );
+        }
+
+    }
+
+    else {
+
+        renderOtherPlayers(
+            lastPlayersSnapshot
+        );
+    }
+}
+
+
+mapToggle.addEventListener(
+    "click",
+    function() {
+
+        setMapMode(!mapModeOn);
+
+    }
+);
+
+
+/* ==================================================
+   TAP GAME CODE TO COPY
+================================================== */
+
+gameCodeBadge.addEventListener(
+    "click",
+    function() {
+
+        if (
+            navigator.clipboard &&
+            navigator.clipboard.writeText
+        ) {
+
+            navigator.clipboard.writeText(
+                myGameCode
+            );
+        }
+    }
+);
+
+
+/* ==================================================
+   LIVE MAP INIT
+================================================== */
+
+function initMap(lat, lng) {
+
+    if (
+        typeof L === "undefined"
+        ||
+        !document.getElementById("map")
+    ) {
+
+        return;
+    }
+
+    leafletMap = L.map(
+        "map",
+        {
+            zoomControl: true,
+            attributionControl: true,
+            dragging: true,
+            scrollWheelZoom: true,
+            doubleClickZoom: true,
+            touchZoom: true,
+            boxZoom: true,
+            keyboard: true
+        }
+    ).setView([lat, lng], 18);
+
+    leafletMap.zoomControl.setPosition(
+        "bottomright"
+    );
+
+    L.tileLayer(
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        {
+            maxZoom: 19,
+            attribution:
+                "&copy; OpenStreetMap contributors"
+        }
+    ).addTo(leafletMap);
+
+
+    /* if the person drags/zooms the map away from
+       their live position, drop out of follow mode
+       — same pattern as Google Maps' blue dot */
+    leafletMap.on(
+        "dragstart",
+        function() {
+
+            followMe = false;
+
+            recenterBtn.classList.add(
+                "visible"
+            );
+
+            /* switch immediately using the last
+               known fix instead of waiting for the
+               next (possibly slow) GPS callback */
+            if (myLastLat !== null) {
+
+                showSelfMapMarker(
+                    myLastLat,
+                    myLastLng
+                );
+            }
+        }
+    );
+
+    mapReady = true;
+
+    renderOtherPlayers(lastPlayersSnapshot);
+}
+
+
+recenterBtn.addEventListener(
+    "click",
+    function() {
+
+        followMe = true;
+
+        recenterBtn.classList.remove(
+            "visible"
+        );
+
+        hideSelfMapMarker();
+
+        if (
+            mapReady
+            &&
+            myLastLat !== null
+        ) {
+
+            leafletMap.panTo(
+                [myLastLat, myLastLng],
+                { animate: true }
+            );
+        }
+    }
+);
+
+
+/* ==================================================
+   MULTIPLAYER — JOIN / SEND / RECEIVE
+================================================== */
+
+function joinGame() {
+
+    if (!db || !myGameCode) {
+
+        return;
+    }
+
+    playersRef =
+        db.ref(
+            "games/" + myGameCode + "/players"
+        );
+
+    const myRef =
+        playersRef.child(myUid);
+
+    /* remove me automatically if I close the tab */
+    myRef.onDisconnect().remove();
+
+    /* listen for everyone else's positions */
+    playersRef.on(
+        "value",
+        function(snapshot) {
+
+            renderOtherPlayers(
+                snapshot.val() || {}
+            );
+        }
+    );
+}
+
+
+/* ==================================================
+   SWITCH ROOMS (used by the admin "join" button —
+   leaves the current room cleanly and joins another
+   without restarting the whole app)
+================================================== */
+
+function switchGame(newCode) {
+
+    if (!db || newCode === myGameCode) {
+
+        return;
+    }
+
+    if (playersRef) {
+
+        playersRef.off();
+
+        db.ref(
+            "games/" + myGameCode +
+            "/players/" + myUid
+        ).remove();
+    }
+
+    clearMapPlayers();
+
+    clearGridPlayers();
+
+    myGameCode = newCode;
+
+    localStorage.setItem(
+        "hidea_gamecode",
+        myGameCode
+    );
+
+    gameCodeValue.textContent =
+        myGameCode;
+
+    joinGame();
+
+    if (myLastLat !== null) {
+
+        sendMyPosition({
+            latitude: myLastLat,
+            longitude: myLastLng
+        });
+    }
+}
+
+
+/* ==================================================
+   ADMIN PANEL
+================================================== */
+
+function openRoomBrowser(mode) {
+
+    if (!db) {
+
+        return;
+    }
+
+    roomBrowserMode = mode;
+
+    document.querySelector(
+        "#adminPanel .admin-panel-header span"
+    ).textContent =
+
+        mode === "admin"
+            ? "Game Rooms (Admin)"
+            : "Open Game Rooms";
+
+    adminPanel.classList.add("open");
+
+    adminRoomsRef =
+        db.ref("games");
+
+    adminRoomsRef.on(
+        "value",
+        function(snapshot) {
+
+            renderAdminRooms(
+                snapshot.val() || {}
+            );
+        }
+    );
+}
+
+
+function closeAdminPanel() {
+
+    adminPanel.classList.remove("open");
+
+    if (adminRoomsRef) {
+
+        adminRoomsRef.off();
+
+        adminRoomsRef = null;
+    }
+}
+
+
+function renderAdminRooms(games) {
+
+    const codes =
+        Object.keys(games).filter(
+            function(code) {
+
+                const players =
+                    games[code].players || {};
+
+                return (
+                    Object.keys(players).length
+                    > 0
+                );
+            }
+        );
+
+
+    if (codes.length === 0) {
+
+        adminRoomList.innerHTML =
+            '<div class="admin-room-empty">' +
+            'No active game rooms right now.' +
+            '</div>';
+
+        return;
+    }
+
+
+    adminRoomList.innerHTML = "";
+
+    codes.forEach(
+        function(code) {
+
+            const players =
+                games[code].players || {};
+
+            const count =
+                Object.keys(players).length;
+
+            const row =
+                document.createElement("div");
+
+            row.className =
+                "admin-room-row";
+
+            const isAdminMode =
+                roomBrowserMode === "admin";
+
+            row.innerHTML =
+
+                '<div class="arr-info">' +
+                '<div class="arr-code">' +
+                escapeHtml(code) +
+                '</div>' +
+                '<div class="arr-count">' +
+                count +
+                (count === 1 ? " player" : " players") +
+                '</div>' +
+                '</div>' +
+                '<div class="arr-buttons">' +
+                '<button class="arr-players" title="See members">' +
+                '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" ' +
+                'stroke="currentColor" stroke-width="2" ' +
+                'stroke-linecap="round" stroke-linejoin="round">' +
+                '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>' +
+                '<circle cx="9" cy="7" r="4"/>' +
+                '<path d="M23 21v-2a4 4 0 0 0-3-3.87"/>' +
+                '<path d="M16 3.13a4 4 0 0 1 0 7.75"/>' +
+                '</svg>' +
+                '</button>' +
+                '<button class="arr-join">JOIN</button>' +
+                (
+                    isAdminMode
+                        ? '<button class="arr-delete">DELETE</button>'
+                        : ""
+                ) +
+                '</div>';
+
+            row.querySelector(
+                ".arr-join"
+            ).addEventListener(
+                "click",
+                function() {
+
+                    if (isAdminMode) {
+
+                        switchGame(code);
+
+                        closeAdminPanel();
+
+                    }
+
+                    else {
+
+                        /* not in a game yet — just
+                           fill the code in, let them
+                           review before continuing */
+                        gameCodeInput.value = code;
+
+                        closeAdminPanel();
+                    }
+                }
+            );
+
+            if (isAdminMode) {
+
+                row.querySelector(
+                    ".arr-delete"
+                ).addEventListener(
+                    "click",
+                    function() {
+
+                        if (
+                            confirm(
+                                "Delete room " +
+                                code +
+                                "? This removes it " +
+                                "for everyone in it."
+                            )
+                        ) {
+
+                            db.ref(
+                                "games/" + code
+                            ).remove();
+                        }
+                    }
+                );
+            }
+
+
+            const playerBox =
+                document.createElement("div");
+
+            playerBox.className =
+                "arr-player-list";
+
+            playerBox.style.display =
+                "none";
+
+            Object.keys(players).forEach(
+                function(uid) {
+
+                    const p =
+                        players[uid] || {};
+
+                    const pRow =
+                        document.createElement(
+                            "div"
+                        );
+
+                    pRow.className =
+                        "arr-player-row";
+
+                    pRow.innerHTML =
+
+                        '<span class="arr-player-name">' +
+                        escapeHtml(
+                            p.name || "Explorer"
+                        ) +
+                        '</span>' +
+                        (
+                            isAdminMode
+                                ? '<button class="arr-kick">KICK</button>'
+                                : ""
+                        );
+
+                    if (isAdminMode) {
+
+                        pRow.querySelector(
+                            ".arr-kick"
+                        ).addEventListener(
+                            "click",
+                            function() {
+
+                                db.ref(
+                                    "games/" + code +
+                                    "/players/" + uid
+                                ).remove();
+                            }
+                        );
+                    }
+
+                    playerBox.appendChild(pRow);
+                }
+            );
+
+            row.querySelector(
+                ".arr-players"
+            ).addEventListener(
+                "click",
+                function() {
+
+                    playerBox.style.display =
+
+                        playerBox.style.display
+                        === "none"
+                            ? "flex"
+                            : "none";
+                }
+            );
+
+
+            const wrapper =
+                document.createElement("div");
+
+            wrapper.appendChild(row);
+
+            wrapper.appendChild(playerBox);
+
+            adminRoomList.appendChild(wrapper);
+        }
+    );
+}
+
+
+adminBtn.addEventListener(
+    "click",
+    function() {
+
+        openRoomBrowser("admin");
+    }
+);
+
+
+adminCloseBtn.addEventListener(
+    "click",
+    closeAdminPanel
+);
+
+
+function sendMyPosition(coords) {
+
+    if (!db || !myGameCode) {
+
+        return;
+    }
+
+    db.ref(
+        "games/" + myGameCode +
+        "/players/" + myUid
+    ).set({
+
+        name: playerName.textContent,
+        color: selectedColor,
+        lat: coords.latitude,
+        lng: coords.longitude,
+        heading: lastHeadingDeg,
+        updatedAt:
+            firebase.database.ServerValue
+                .TIMESTAMP
+
+    });
+}
+
+
+/* ==================================================
+   SHARED AVATAR MARKUP
+   Same visual language everywhere a player (other
+   than "me while following") is rendered.
+================================================== */
+
+function avatarHTML(name, color, headingDeg) {
+
+    const initial =
+        (name || "Explorer")
+            .trim()
+            .charAt(0)
+            .toUpperCase();
+
+    const rotation =
+        typeof headingDeg === "number"
+            ? headingDeg
+            : 0;
+
+    return (
+        '<div class="avatar-badge" style="--avatar-color:' +
+        (color || "#4285f4") +
+        '">' +
+        '<div class="avatar-name">' +
+        escapeHtml(name || "Explorer") +
+        '</div>' +
+        '<div class="avatar-pointer" style="transform:rotate(' +
+        rotation +
+        'deg)"></div>' +
+        '<div class="avatar-circle">' +
+        escapeHtml(initial) +
+        '</div>' +
+        '</div>'
+    );
+}
+
+
+/* ==================================================
+   OTHER PLAYERS — DISPATCH (map vs grid rendering)
+================================================== */
+
+function renderOtherPlayers(players) {
+
+    lastPlayersSnapshot = players || {};
+
+    if (mapModeOn) {
+
+        renderMapPlayers(lastPlayersSnapshot);
+
+        clearGridPlayers();
+
+    }
+
+    else {
+
+        renderGridPlayers(lastPlayersSnapshot);
+
+        clearMapPlayers();
+    }
+}
+
+
+function livePlayerList(players) {
+
+    const staleAfter = 30000; // 30s
+    const now = Date.now();
+    const list = [];
+
+    Object.keys(players).forEach(
+        function(uid) {
+
+            if (uid === myUid) {
+
+                return;
+            }
+
+            const p = players[uid];
+
+            if (
+                !p ||
+                typeof p.lat !== "number" ||
+                typeof p.lng !== "number"
+            ) {
+
+                return;
+            }
+
+            if (
+                p.updatedAt &&
+                (now - p.updatedAt) > staleAfter
+            ) {
+
+                return;
+            }
+
+            list.push(
+                Object.assign({ uid: uid }, p)
+            );
+        }
+    );
+
+    return list;
+}
+
+
+/* ---- rendering on the real Leaflet map ---- */
+
+function renderMapPlayers(players) {
+
+    if (!mapReady) {
+
+        return;
+    }
+
+    const live = livePlayerList(players);
+    const seen = {};
+
+    live.forEach(
+        function(p) {
+
+            seen[p.uid] = true;
+
+            const icon =
+                L.divIcon({
+                    html: avatarHTML(
+                        p.name,
+                        p.color,
+                        p.heading
+                    ),
+                    className: "",
+                    iconSize: [40, 40]
+                });
+
+            if (othersLayer[p.uid]) {
+
+                othersLayer[p.uid].setLatLng(
+                    [p.lat, p.lng]
+                );
+
+                othersLayer[p.uid]
+                    .setIcon(icon);
+
+            }
+
+            else {
+
+                othersLayer[p.uid] =
+                    L.marker(
+                        [p.lat, p.lng],
+                        { icon: icon }
+                    ).addTo(leafletMap);
+            }
+        }
+    );
+
+    Object.keys(othersLayer).forEach(
+        function(uid) {
+
+            if (!seen[uid]) {
+
+                leafletMap.removeLayer(
+                    othersLayer[uid]
+                );
+
+                delete othersLayer[uid];
+            }
+        }
+    );
+}
+
+
+function clearMapPlayers() {
+
+    Object.keys(othersLayer).forEach(
+        function(uid) {
+
+            if (leafletMap) {
+
+                leafletMap.removeLayer(
+                    othersLayer[uid]
+                );
+            }
+        }
+    );
+
+    othersLayer = {};
+}
+
+
+/* ---- rendering on the grid backdrop, placed
+   relative to your own live position (no map,
+   no network fetch needed) ---- */
+
+function renderGridPlayers(players) {
+
+    if (
+        myLastLat === null ||
+        myLastLng === null
+    ) {
+
+        return;
+    }
+
+    const live = livePlayerList(players);
+    const seen = {};
+
+    live.forEach(
+        function(p) {
+
+            seen[p.uid] = true;
+
+            const dx =
+                metersEastWest(
+                    myLastLat,
+                    myLastLng,
+                    p.lng
+                );
+
+            const dy =
+                metersNorthSouth(
+                    myLastLat,
+                    p.lat
+                );
+
+            const px =
+                dx * GRID_PX_PER_METER;
+
+            const py =
+                -dy * GRID_PX_PER_METER;
+
+            let el = othersGridEls[p.uid];
+
+            if (!el) {
+
+                el =
+                    document.createElement(
+                        "div"
+                    );
+
+                el.className =
+                    "avatar-badge";
+
+                gridPlayersEl
+                    .appendChild(el);
+
+                othersGridEls[p.uid] = el;
+            }
+
+            el.style.left =
+                "calc(50% + " + px + "px)";
+
+            el.style.top =
+                "calc(50% + " + py + "px)";
+
+            el.style.setProperty(
+                "--avatar-color",
+                p.color || "#4285f4"
+            );
+
+            el.innerHTML =
+                '<div class="avatar-name">' +
+                escapeHtml(p.name || "Explorer") +
+                '</div>' +
+                '<div class="avatar-pointer" style="transform:rotate(' +
+                (typeof p.heading === "number"
+                    ? p.heading
+                    : 0) +
+                'deg)"></div>' +
+                '<div class="avatar-circle">' +
+                escapeHtml(
+                    (p.name || "Explorer")
+                        .trim()
+                        .charAt(0)
+                        .toUpperCase()
+                ) +
+                '</div>';
+        }
+    );
+
+    Object.keys(othersGridEls).forEach(
+        function(uid) {
+
+            if (!seen[uid]) {
+
+                othersGridEls[uid].remove();
+
+                delete othersGridEls[uid];
+            }
+        }
+    );
+}
+
+
+function clearGridPlayers() {
+
+    Object.keys(othersGridEls).forEach(
+        function(uid) {
+
+            othersGridEls[uid].remove();
+        }
+    );
+
+    othersGridEls = {};
+}
+
+
+function escapeHtml(str) {
+
+    const div =
+        document.createElement("div");
+
+    div.textContent = str;
+
+    return div.innerHTML;
+}
+
+
+/* ==================================================
+   GPS WATCH
+================================================== */
+
+function startLocationWatch() {
+
+    if (
+        locationWatch !== null
+    ) {
+
+        navigator.geolocation
+            .clearWatch(
+                locationWatch
+            );
+
+    }
+
+
+    locationWatch =
+        navigator.geolocation
+            .watchPosition(
+
+                updateLocation,
+
+                function() {
+
+                    showLocationError();
+
+                },
+
+                {
+
+                    enableHighAccuracy:
+                        true,
+
+                    maximumAge:
+                        1000,
+
+                    timeout:
+                        15000
+
+                }
+
+            );
+}
+
+
+/* ==================================================
+   REQUEST LOCATION
+================================================== */
+
+function requestLocation() {
+
+    if (
+        !navigator.geolocation
+    ) {
+
+        showLocationError();
+
+        return;
+    }
+
+
+    navigator.geolocation
+        .getCurrentPosition(
+
+            function(position) {
+
+                updateLocation(
+                    position
+                );
+
+                startLocationWatch();
+
+                startCompass();
+
+            },
+
+            function() {
+
+                showLocationError();
+
+            },
+
+            {
+
+                enableHighAccuracy:
+                    true,
+
+                maximumAge:
+                    0,
+
+                timeout:
+                    15000
+
+            }
+
+        );
+}
+
+
+/* ==================================================
+   OPEN ANDROID LOCATION SETTINGS
+================================================== */
+
+function openLocationSettings() {
+
+    const intent =
+        "intent://settings/location" +
+        "#Intent;" +
+        "scheme=android-app;" +
+        "package=com.android.settings;" +
+        "end";
+
+
+    try {
+
+        window.location.href =
+            intent;
+
+    }
+
+    catch (error) {
+
+        requestLocation();
+
+    }
+}
+
+
+/* ==================================================
+   COMPASS
+================================================== */
+
+function handleCompass(event) {
+
+    let direction;
+
+
+    if (
+        event.webkitCompassHeading
+        !== undefined
+    ) {
+
+        direction =
+            event.webkitCompassHeading;
+
+    }
+
+    else if (
+        event.alpha !== null
+    ) {
+
+        direction =
+            360 - event.alpha;
+
+    }
+
+    else {
+
+        return;
+
+    }
+
+
+    direction =
+        (direction + 360) % 360;
+
+
+    lastHeadingDeg = direction;
+
+
+    heading.style.transform =
+
+        "translateX(-50%) rotate("
+        +
+        direction
+        +
+        "deg)";
+}
+
+
+/* ==================================================
+   START COMPASS
+================================================== */
+
+function startCompass() {
+
+    if (
+        compassStarted
+    ) {
+
+        return;
+    }
+
+
+    compassStarted = true;
+
+
+    if (
+
+        typeof DeviceOrientationEvent
+        !== "undefined"
+
+        &&
+
+        typeof DeviceOrientationEvent
+            .requestPermission
+        === "function"
+
+    ) {
+
+        DeviceOrientationEvent
+            .requestPermission()
+            .then(
+
+                function(permission) {
+
+                    if (
+                        permission ===
+                        "granted"
+                    ) {
+
+                        window
+                            .addEventListener(
+                                "deviceorientation",
+                                handleCompass,
+                                true
+                            );
+
+                    }
+
+                }
+
+            )
+            .catch(
+                function() {}
+            );
+
+    }
+
+    else {
+
+        window
+            .addEventListener(
+                "deviceorientationabsolute",
+                handleCompass,
+                true
+            );
+
+
+        window
+            .addEventListener(
+                "deviceorientation",
+                handleCompass,
+                true
+            );
+
+    }
+}
+
+
+/* ==================================================
+   ALLOW LOCATION BUTTON
+================================================== */
+
+document
+    .getElementById("allowButton")
+    .addEventListener(
+        "click",
+        function() {
+
+            requestLocation();
+
+        }
+    );
+
+
+/* ==================================================
+   SETTINGS BUTTON
+================================================== */
+
+document
+    .getElementById("settingsButton")
+    .addEventListener(
+        "click",
+        function() {
+
+            openLocationSettings();
+
+        }
+    );
+
+
+/* ==================================================
+   START COMPASS ON TOUCH
+================================================== */
+
+document.addEventListener(
+
+    "touchstart",
+
+    function() {
+
+        startCompass();
+
+    },
+
+    {
+
+        once: true,
+
+        passive: true
+
+    }
+
+);
+
+</script>
+
+</body>
+
+</html>
