@@ -619,8 +619,15 @@ body {
 
     opacity: .45;
 
+    /* glide toward each new GPS fix instead of
+       snapping straight to it — this is the same
+       trick Google Maps uses to make the blue dot
+       look like it's smoothly walking rather than
+       teleporting once a second */
     transition:
-        opacity .2s ease;
+        opacity .2s ease,
+        background-position .45s
+        cubic-bezier(.25,.1,.25,1);
 }
 
 
@@ -995,6 +1002,48 @@ body {
 }
 
 
+/* small role indicator, pinned to the corner of
+   the avatar circle so hunters/hiders are visually
+   distinguishable at a glance on the map/grid */
+.avatar-role {
+
+    position: absolute;
+
+    left: 50%;
+
+    top: 50%;
+
+    width: 15px;
+    height: 15px;
+
+    transform:
+        translate(4px, 4px);
+
+    border-radius: 50%;
+
+    background:
+        var(--background);
+
+    border:
+        1.5px solid
+        var(--background);
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 9px;
+
+    line-height: 1;
+
+    box-shadow:
+        0 1px 3px
+        rgba(0,0,0,.25);
+}
+
+
 /* container for other players rendered directly
    on the grid backdrop (non-map mode) */
 #gridPlayers {
@@ -1012,6 +1061,13 @@ body {
 #gridPlayers .avatar-badge {
 
     position: absolute;
+
+    /* smooth glide toward each new position update
+       instead of jumping, matching the self-dot's
+       grid animation above */
+    transition:
+        left .45s cubic-bezier(.25,.1,.25,1),
+        top .45s cubic-bezier(.25,.1,.25,1);
 }
 
 
@@ -1314,6 +1370,73 @@ body {
     opacity: 0;
 
     cursor: pointer;
+}
+
+
+/* ==================================================
+   ROLE SELECTOR (hider / seeker)
+================================================== */
+
+.role-row {
+
+    display: flex;
+
+    gap: 10px;
+
+    margin-bottom: 22px;
+}
+
+
+.role-option {
+
+    flex: 1;
+
+    height: 44px;
+
+    border-radius: 12px;
+
+    border:
+        2px solid
+        transparent;
+
+    background:
+        var(--button-background);
+
+    color:
+        var(--muted);
+
+    font-family:
+        var(--font-heading);
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    letter-spacing: .3px;
+
+    cursor: pointer;
+
+    transition:
+        transform .12s ease,
+        border-color .15s ease,
+        color .15s ease;
+}
+
+
+.role-option:active {
+
+    transform:
+        scale(.96);
+}
+
+
+.role-option.selected {
+
+    color:
+        var(--text);
+
+    border-color:
+        var(--player-color, #4285f4);
 }
 
 
@@ -1861,6 +1984,436 @@ body {
 
     transform:
         scale(.95);
+}
+
+
+/* ==================================================
+   PLAYER COUNT BADGE
+================================================== */
+
+.player-count-badge {
+
+    position: absolute;
+
+    bottom:
+        calc(
+            64px +
+            env(safe-area-inset-bottom)
+        );
+
+    left: 50%;
+
+    transform:
+        translateX(-50%);
+
+    z-index: 3;
+
+    display: flex;
+
+    gap: 10px;
+
+    height: 28px;
+
+    padding: 0 14px;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 14px;
+
+    border:
+        1px solid
+        var(--border);
+
+    background:
+        color-mix(
+            in srgb,
+            var(--button-background) 75%,
+            transparent
+        );
+
+    backdrop-filter:
+        blur(10px);
+
+    -webkit-backdrop-filter:
+        blur(10px);
+
+    box-shadow:
+        0 3px 12px
+        rgba(0,0,0,.14);
+
+    font-family:
+        var(--font-heading);
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    color:
+        var(--text);
+}
+
+
+.player-count-badge .pc-item {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 4px;
+}
+
+
+/* ==================================================
+   ROUND TIMER
+================================================== */
+
+.round-badge {
+
+    position: absolute;
+
+    top:
+        calc(
+            60px +
+            env(safe-area-inset-top)
+        );
+
+    right:
+        calc(
+            18px +
+            env(safe-area-inset-right)
+        );
+
+    z-index: 3;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 1px;
+
+    min-width: 68px;
+
+    height: 40px;
+
+    padding: 3px 12px;
+
+    border-radius: 14px;
+
+    border:
+        1px solid
+        var(--border);
+
+    background:
+        color-mix(
+            in srgb,
+            var(--button-background) 80%,
+            transparent
+        );
+
+    backdrop-filter:
+        blur(10px);
+
+    -webkit-backdrop-filter:
+        blur(10px);
+
+    box-shadow:
+        0 3px 12px
+        rgba(0,0,0,.14);
+
+    cursor: pointer;
+
+    transition:
+        transform .12s ease;
+}
+
+
+.round-badge:active {
+
+    transform:
+        scale(.95);
+}
+
+
+.round-badge.urgent .rb-value {
+
+    color:
+        var(--error);
+}
+
+
+.round-badge .rb-label {
+
+    font-family:
+        var(--font-heading);
+
+    font-size: 8px;
+
+    font-weight: 700;
+
+    letter-spacing: .5px;
+
+    color:
+        var(--muted);
+}
+
+
+.round-badge .rb-value {
+
+    font-family:
+        var(--font-mono, monospace);
+
+    font-size: 15px;
+
+    font-weight: 700;
+
+    color:
+        var(--text);
+
+    font-variant-numeric:
+        tabular-nums;
+}
+
+
+.round-input-row {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 8px;
+
+    margin-bottom: 18px;
+}
+
+
+.round-input-row input {
+
+    width: 80px;
+
+    height: 42px;
+
+    border-radius: 10px;
+
+    border:
+        1px solid
+        var(--border);
+
+    background:
+        var(--button-background);
+
+    color:
+        var(--text);
+
+    text-align: center;
+
+    font-size: 18px;
+
+    font-family:
+        var(--font-mono, monospace);
+}
+
+
+.round-input-suffix {
+
+    font-size: 13px;
+
+    color:
+        var(--muted);
+}
+
+
+.round-reset-btn {
+
+    width: 100%;
+
+    margin-top: 10px;
+
+    background: none;
+
+    border: none;
+
+    color:
+        var(--muted);
+
+    font-size: 12px;
+
+    text-decoration: underline;
+
+    cursor: pointer;
+}
+
+
+/* ==================================================
+   PROXIMITY ALERT BANNER
+================================================== */
+
+.proximity-banner {
+
+    position: absolute;
+
+    top:
+        calc(
+            108px +
+            env(safe-area-inset-top)
+        );
+
+    left: 50%;
+
+    transform:
+        translateX(-50%)
+        translateY(-14px);
+
+    z-index: 4;
+
+    max-width: 88vw;
+
+    padding: 9px 16px;
+
+    border-radius: 14px;
+
+    background:
+        color-mix(
+            in srgb,
+            var(--error) 88%,
+            var(--background)
+        );
+
+    color: #fff;
+
+    font-family:
+        var(--font-heading);
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    letter-spacing: .2px;
+
+    text-align: center;
+
+    box-shadow:
+        0 6px 18px
+        rgba(0,0,0,.25);
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    transition:
+        opacity .25s ease,
+        transform .25s ease;
+}
+
+
+.proximity-banner.show {
+
+    opacity: 1;
+
+    transform:
+        translateX(-50%)
+        translateY(0);
+}
+
+
+/* ==================================================
+   CLOAK POWER-UP (hider only)
+================================================== */
+
+.cloak-btn {
+
+    position: absolute;
+
+    bottom:
+        calc(
+            64px +
+            env(safe-area-inset-bottom)
+        );
+
+    left:
+        calc(
+            18px +
+            env(safe-area-inset-left)
+        );
+
+    z-index: 3;
+
+    height: 34px;
+
+    padding: 0 14px;
+
+    border-radius: 17px;
+
+    border:
+        1px solid
+        var(--border);
+
+    background:
+        color-mix(
+            in srgb,
+            var(--button-background) 80%,
+            transparent
+        );
+
+    backdrop-filter:
+        blur(10px);
+
+    -webkit-backdrop-filter:
+        blur(10px);
+
+    box-shadow:
+        0 3px 12px
+        rgba(0,0,0,.14);
+
+    color:
+        var(--text);
+
+    font-family:
+        var(--font-heading);
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    letter-spacing: .3px;
+
+    cursor: pointer;
+
+    transition:
+        transform .12s ease,
+        opacity .2s ease;
+}
+
+
+.cloak-btn:active {
+
+    transform:
+        scale(.95);
+}
+
+
+.cloak-btn:disabled {
+
+    opacity: .5;
+
+    cursor: default;
+}
+
+
+.cloak-btn.active {
+
+    border-color:
+        var(--player-color, #4285f4);
+
+    color:
+        var(--player-color, #4285f4);
 }
 
 
@@ -2867,6 +3420,29 @@ body {
     </div>
 
 
+    <div class="role-row">
+
+        <button
+            class="role-option"
+            id="roleHider"
+            data-role="hider">
+
+            🙈 HIDER
+
+        </button>
+
+        <button
+            class="role-option"
+            id="roleSeeker"
+            data-role="seeker">
+
+            🔍 SEEKER
+
+        </button>
+
+    </div>
+
+
     <button id="startButton">
         Continue
     </button>
@@ -2958,6 +3534,42 @@ body {
     </div>
 
 
+    <div
+        class="player-count-badge"
+        id="playerCountBadge">
+
+        <span class="pc-item">
+            🙈 <span id="hiderCount">0</span>
+        </span>
+
+        <span class="pc-item">
+            🔍 <span id="seekerCount">0</span>
+        </span>
+
+    </div>
+
+
+    <div
+        class="round-badge"
+        id="roundBadge">
+
+        <span class="rb-label" id="roundLabel">
+            ROUND
+        </span>
+
+        <span class="rb-value" id="roundValue">
+            --:--
+        </span>
+
+    </div>
+
+
+    <div
+        class="proximity-banner"
+        id="proximityBanner">
+    </div>
+
+
     <button
         class="admin-btn"
         id="adminBtn"
@@ -2970,6 +3582,14 @@ body {
         class="leave-btn"
         id="leaveBtn">
         LEAVE LOBBY
+    </button>
+
+
+    <button
+        class="cloak-btn"
+        id="cloakBtn"
+        style="display:none;">
+        🫥 CLOAK
     </button>
 
 
@@ -3037,6 +3657,64 @@ body {
             </button>
 
         </div>
+
+    </div>
+
+</div>
+
+
+<!-- ==================================================
+     ROUND TIMER SETUP
+================================================== -->
+
+<div
+    id="roundPanel"
+    class="leave-confirm">
+
+    <div class="leave-confirm-box">
+
+        <div class="leave-confirm-title">
+            Round Timer
+        </div>
+
+        <div class="leave-confirm-body">
+            Set how long this round runs.
+            Everyone in the lobby sees the
+            same countdown.
+        </div>
+
+        <div class="round-input-row">
+
+            <input
+                type="number"
+                id="roundMinutes"
+                min="1"
+                max="180"
+                value="10">
+
+            <span class="round-input-suffix">
+                minutes
+            </span>
+
+        </div>
+
+        <div class="leave-confirm-actions">
+
+            <button id="roundCancelBtn">
+                CLOSE
+            </button>
+
+            <button id="roundStartBtn">
+                START
+            </button>
+
+        </div>
+
+        <button
+            id="roundResetBtn"
+            class="round-reset-btn">
+            Reset / stop timer
+        </button>
 
     </div>
 
@@ -3154,6 +3832,11 @@ let selectedColor =
         "hidea_color"
     ) || "#4285F4";
 
+let selectedRole =
+    localStorage.getItem(
+        "hidea_role"
+    ) || "hider";
+
 
 /* multiplayer state */
 
@@ -3194,6 +3877,35 @@ let followMe = true;
 let lastPlayersSnapshot = {};
 
 let selfMapMarker = null;
+
+
+/* round timer */
+
+let roundRef = null;
+
+let roundTickInterval = null;
+
+
+/* proximity alerts */
+
+let wasInProximity = false;
+
+
+/* cloak power-up (hider only) */
+
+let isCloaked = false;
+
+let cloakEndTimeout = null;
+
+let cloakCooldownUntil = 0;
+
+let cloakTickInterval = null;
+
+const CLOAK_DURATION_MS = 10000;
+
+const CLOAK_COOLDOWN_MS = 60000;
+
+const PROXIMITY_RADIUS_M = 50;
 
 
 /* admin */
@@ -3332,6 +4044,45 @@ const leaveCancelBtn =
 
 const leaveConfirmBtn =
     document.getElementById("leaveConfirmBtn");
+
+const playerCountBadge =
+    document.getElementById("playerCountBadge");
+
+const hiderCountEl =
+    document.getElementById("hiderCount");
+
+const seekerCountEl =
+    document.getElementById("seekerCount");
+
+const roundBadge =
+    document.getElementById("roundBadge");
+
+const roundLabel =
+    document.getElementById("roundLabel");
+
+const roundValue =
+    document.getElementById("roundValue");
+
+const roundPanel =
+    document.getElementById("roundPanel");
+
+const roundMinutesInput =
+    document.getElementById("roundMinutes");
+
+const roundStartBtn =
+    document.getElementById("roundStartBtn");
+
+const roundCancelBtn =
+    document.getElementById("roundCancelBtn");
+
+const roundResetBtn =
+    document.getElementById("roundResetBtn");
+
+const proximityBanner =
+    document.getElementById("proximityBanner");
+
+const cloakBtn =
+    document.getElementById("cloakBtn");
 
 
 /* ==================================================
@@ -3528,6 +4279,67 @@ document
 
 
 /* ==================================================
+   ROLE SELECTOR (hider / seeker)
+================================================== */
+
+function applyRole() {
+
+    document
+        .getElementById("roleHider")
+        .classList.toggle(
+            "selected",
+            selectedRole === "hider"
+        );
+
+    document
+        .getElementById("roleSeeker")
+        .classList.toggle(
+            "selected",
+            selectedRole === "seeker"
+        );
+}
+
+
+applyRole();
+
+
+document
+    .getElementById("roleHider")
+    .addEventListener(
+        "click",
+        function() {
+
+            selectedRole = "hider";
+
+            localStorage.setItem(
+                "hidea_role",
+                selectedRole
+            );
+
+            applyRole();
+        }
+    );
+
+
+document
+    .getElementById("roleSeeker")
+    .addEventListener(
+        "click",
+        function() {
+
+            selectedRole = "seeker";
+
+            localStorage.setItem(
+                "hidea_role",
+                selectedRole
+            );
+
+            applyRole();
+        }
+    );
+
+
+/* ==================================================
    START
 ================================================== */
 
@@ -3591,6 +4403,10 @@ document
 
             adminBtn.style.display =
                 isAdmin ? "flex" : "none";
+
+            cloakBtn.style.display =
+                selectedRole === "hider"
+                    ? "flex" : "none";
 
 
             setup.style.display =
@@ -3986,7 +4802,8 @@ function showSelfMapMarker(lat, lng) {
             html: avatarHTML(
                 playerName.textContent,
                 selectedColor,
-                (displayHeadingDeg !== null ? displayHeadingDeg : lastHeadingDeg)
+                (displayHeadingDeg !== null ? displayHeadingDeg : lastHeadingDeg),
+                selectedRole
             ),
             className: "",
             iconSize: [40, 40]
@@ -4337,6 +5154,8 @@ function joinGame() {
             );
         }
     );
+
+    attachRoundListener();
 }
 
 
@@ -4362,6 +5181,8 @@ function switchGame(newCode) {
             "/players/" + myUid
         ).remove();
     }
+
+    detachRoundListener();
 
     clearMapPlayers();
 
@@ -4467,6 +5288,36 @@ function leaveGame() {
     adminBtn.style.display = "none";
 
 
+    detachRoundListener();
+
+    roundPanel.classList.remove("open");
+
+
+    stopCloakTicking();
+
+    isCloaked = false;
+
+    cloakCooldownUntil = 0;
+
+    cloakBtn.style.display = "none";
+
+    cloakBtn.disabled = false;
+
+    cloakBtn.classList.remove("active");
+
+    cloakBtn.textContent = "🫥 CLOAK";
+
+
+    proximityBanner.classList.remove("show");
+
+    wasInProximity = false;
+
+
+    hiderCountEl.textContent = "0";
+
+    seekerCountEl.textContent = "0";
+
+
     hideLocationError();
 
     recenterBtn.classList.remove("visible");
@@ -4505,6 +5356,379 @@ leaveConfirmBtn.addEventListener(
         leaveConfirm.classList.remove("open");
 
         leaveGame();
+    }
+);
+
+
+/* ==================================================
+   ROUND TIMER
+   Any player can start/adjust it — everyone in the
+   room reads the same games/{code}/round node, so
+   the countdown stays in sync across all devices.
+================================================== */
+
+function formatMMSS(ms) {
+
+    const totalSeconds =
+        Math.max(0, Math.round(ms / 1000));
+
+    const m =
+        Math.floor(totalSeconds / 60);
+
+    const s =
+        totalSeconds % 60;
+
+    return (
+        String(m).padStart(2, "0") +
+        ":" +
+        String(s).padStart(2, "0")
+    );
+}
+
+
+function stopRoundTicking() {
+
+    if (roundTickInterval !== null) {
+
+        clearInterval(roundTickInterval);
+
+        roundTickInterval = null;
+    }
+}
+
+
+function startRoundTicking(endAt) {
+
+    stopRoundTicking();
+
+    function tick() {
+
+        const remaining =
+            endAt - Date.now();
+
+        if (remaining <= 0) {
+
+            roundValue.textContent =
+                "00:00";
+
+            roundLabel.textContent =
+                "TIME'S UP";
+
+            roundBadge.classList.add(
+                "urgent"
+            );
+
+            stopRoundTicking();
+
+            return;
+        }
+
+        roundValue.textContent =
+            formatMMSS(remaining);
+
+        roundLabel.textContent =
+            "ROUND";
+
+        roundBadge.classList.toggle(
+            "urgent",
+            remaining <= 60000
+        );
+    }
+
+    tick();
+
+    roundTickInterval =
+        setInterval(tick, 1000);
+}
+
+
+function attachRoundListener() {
+
+    if (!db || !myGameCode) {
+
+        return;
+    }
+
+    roundRef =
+        db.ref(
+            "games/" + myGameCode + "/round"
+        );
+
+    roundRef.on(
+        "value",
+        function(snapshot) {
+
+            const data = snapshot.val();
+
+            if (data && data.endAt) {
+
+                startRoundTicking(data.endAt);
+
+            } else {
+
+                stopRoundTicking();
+
+                roundValue.textContent =
+                    "--:--";
+
+                roundLabel.textContent =
+                    "ROUND";
+
+                roundBadge.classList.remove(
+                    "urgent"
+                );
+            }
+        }
+    );
+}
+
+
+function detachRoundListener() {
+
+    if (roundRef) {
+
+        roundRef.off();
+
+        roundRef = null;
+    }
+
+    stopRoundTicking();
+
+    roundValue.textContent = "--:--";
+
+    roundLabel.textContent = "ROUND";
+
+    roundBadge.classList.remove("urgent");
+}
+
+
+roundBadge.addEventListener(
+    "click",
+    function() {
+
+        roundPanel.classList.add("open");
+    }
+);
+
+
+roundCancelBtn.addEventListener(
+    "click",
+    function() {
+
+        roundPanel.classList.remove("open");
+    }
+);
+
+
+roundStartBtn.addEventListener(
+    "click",
+    function() {
+
+        if (!db || !myGameCode) {
+
+            return;
+        }
+
+        const minutes =
+            Math.min(
+                180,
+                Math.max(
+                    1,
+                    parseInt(
+                        roundMinutesInput.value,
+                        10
+                    ) || 10
+                )
+            );
+
+        db.ref(
+            "games/" + myGameCode + "/round"
+        ).set({
+
+            endAt:
+                Date.now() +
+                minutes * 60000,
+
+            duration:
+                minutes * 60
+
+        });
+
+        roundPanel.classList.remove("open");
+    }
+);
+
+
+roundResetBtn.addEventListener(
+    "click",
+    function() {
+
+        if (db && myGameCode) {
+
+            db.ref(
+                "games/" + myGameCode + "/round"
+            ).remove();
+        }
+
+        roundPanel.classList.remove("open");
+    }
+);
+
+
+/* ==================================================
+   CLOAK POWER-UP (hider only)
+   Hides your marker from every other player for
+   10 seconds, then a 60-second cooldown before it
+   can be used again.
+================================================== */
+
+function updateCloakButton() {
+
+    if (!cloakBtn) {
+
+        return;
+    }
+
+    if (isCloaked) {
+
+        cloakBtn.disabled = true;
+
+        cloakBtn.classList.add("active");
+
+        return;
+    }
+
+    const cooldownLeft =
+        cloakCooldownUntil - Date.now();
+
+    if (cooldownLeft > 0) {
+
+        cloakBtn.disabled = true;
+
+        cloakBtn.classList.remove("active");
+
+        cloakBtn.textContent =
+            "🫥 " +
+            Math.ceil(cooldownLeft / 1000) +
+            "s";
+
+    } else {
+
+        cloakBtn.disabled = false;
+
+        cloakBtn.classList.remove("active");
+
+        cloakBtn.textContent = "🫥 CLOAK";
+    }
+}
+
+
+function stopCloakTicking() {
+
+    if (cloakTickInterval !== null) {
+
+        clearInterval(cloakTickInterval);
+
+        cloakTickInterval = null;
+    }
+}
+
+
+cloakBtn.addEventListener(
+    "click",
+    function() {
+
+        if (
+            isCloaked ||
+            cloakCooldownUntil > Date.now()
+        ) {
+
+            return;
+        }
+
+        isCloaked = true;
+
+        updateCloakButton();
+
+        /* push the flag immediately rather than
+           waiting for the next GPS tick, so cloak
+           feels instant */
+        if (myLastLat !== null) {
+
+            sendMyPosition({
+                latitude: myLastLat,
+                longitude: myLastLng
+            });
+        }
+
+        if (navigator.vibrate) {
+
+            navigator.vibrate(40);
+        }
+
+        let msLeft = CLOAK_DURATION_MS;
+
+        cloakBtn.textContent =
+            "🫥 " +
+            Math.ceil(msLeft / 1000) +
+            "s";
+
+        stopCloakTicking();
+
+        cloakTickInterval =
+            setInterval(
+                function() {
+
+                    msLeft -= 1000;
+
+                    if (msLeft <= 0) {
+
+                        stopCloakTicking();
+
+                        isCloaked = false;
+
+                        cloakCooldownUntil =
+                            Date.now() +
+                            CLOAK_COOLDOWN_MS;
+
+                        if (myLastLat !== null) {
+
+                            sendMyPosition({
+                                latitude: myLastLat,
+                                longitude: myLastLng
+                            });
+                        }
+
+                        updateCloakButton();
+
+                        cloakTickInterval =
+                            setInterval(
+                                updateCloakButton,
+                                1000
+                            );
+
+                        /* stop the cooldown-display
+                           interval once it hits zero */
+                        setTimeout(
+                            function() {
+
+                                stopCloakTicking();
+
+                                updateCloakButton();
+                            },
+                            CLOAK_COOLDOWN_MS + 200
+                        );
+
+                        return;
+                    }
+
+                    cloakBtn.textContent =
+                        "🫥 " +
+                        Math.ceil(msLeft / 1000) +
+                        "s";
+                },
+                1000
+            );
     }
 );
 
@@ -4716,6 +5940,13 @@ function renderAdminRooms(games) {
                     pRow.innerHTML =
 
                         '<span class="arr-player-name">' +
+                        (
+                            p.role === "seeker"
+                                ? "🔍 "
+                                : p.role === "hider"
+                                    ? "🙈 "
+                                    : ""
+                        ) +
                         escapeHtml(
                             p.name || "Explorer"
                         ) +
@@ -4804,6 +6035,8 @@ function sendMyPosition(coords) {
 
         name: playerName.textContent,
         color: selectedColor,
+        role: selectedRole,
+        cloaked: isCloaked,
         lat: coords.latitude,
         lng: coords.longitude,
         heading: (displayHeadingDeg !== null ? displayHeadingDeg : lastHeadingDeg),
@@ -4821,7 +6054,7 @@ function sendMyPosition(coords) {
    than "me while following") is rendered.
 ================================================== */
 
-function avatarHTML(name, color, headingDeg) {
+function avatarHTML(name, color, headingDeg, role) {
 
     const initial =
         (name || "Explorer")
@@ -4834,10 +6067,18 @@ function avatarHTML(name, color, headingDeg) {
             ? headingDeg
             : 0;
 
+    const roleBadge =
+        role === "seeker"
+            ? '<div class="avatar-role seeker">🔍</div>'
+            : role === "hider"
+                ? '<div class="avatar-role hider">🙈</div>'
+                : "";
+
     return (
         '<div class="avatar-badge" style="--avatar-color:' +
         (color || "#4285f4") +
         '">' +
+        roleBadge +
         '<div class="avatar-name">' +
         escapeHtml(name || "Explorer") +
         '</div>' +
@@ -4874,6 +6115,10 @@ function renderOtherPlayers(players) {
 
         clearMapPlayers();
     }
+
+    updatePlayerCounts(lastPlayersSnapshot);
+
+    checkProximity(lastPlayersSnapshot);
 }
 
 
@@ -4910,6 +6155,14 @@ function livePlayerList(players) {
                 return;
             }
 
+            /* a cloaked hider is meant to be fully
+               invisible to everyone else — leave them
+               out of anything players actually see */
+            if (p.cloaked === true) {
+
+                return;
+            }
+
             list.push(
                 Object.assign({ uid: uid }, p)
             );
@@ -4917,6 +6170,175 @@ function livePlayerList(players) {
     );
 
     return list;
+}
+
+
+/* ==================================================
+   PLAYER COUNTS (hiders vs seekers currently in
+   the room — counts everyone regardless of cloak,
+   since this is just a headcount, not a location)
+================================================== */
+
+function updatePlayerCounts(players) {
+
+    if (!hiderCountEl || !seekerCountEl) {
+
+        return;
+    }
+
+    const staleAfter = 30000;
+    const now = Date.now();
+
+    let hiders = 0;
+
+    let seekers = 0;
+
+    if (myGameCode) {
+
+        if (selectedRole === "seeker") {
+
+            seekers++;
+
+        } else {
+
+            hiders++;
+        }
+    }
+
+    Object.keys(players).forEach(
+        function(uid) {
+
+            if (uid === myUid) {
+
+                return;
+            }
+
+            const p = players[uid];
+
+            if (!p) {
+
+                return;
+            }
+
+            if (
+                p.updatedAt &&
+                (now - p.updatedAt) > staleAfter
+            ) {
+
+                return;
+            }
+
+            if (p.role === "seeker") {
+
+                seekers++;
+
+            } else {
+
+                hiders++;
+            }
+        }
+    );
+
+    hiderCountEl.textContent = hiders;
+
+    seekerCountEl.textContent = seekers;
+}
+
+
+/* ==================================================
+   PROXIMITY ALERTS
+   Warns hiders when a seeker is within 50m, and
+   seekers when a hider is within 50m — mutual, so
+   both sides play with the same information.
+================================================== */
+
+function checkProximity(players) {
+
+    if (
+        !proximityBanner ||
+        myLastLat === null ||
+        myLastLng === null ||
+        !myGameCode
+    ) {
+
+        return;
+    }
+
+    const oppositeRole =
+        selectedRole === "seeker"
+            ? "hider" : "seeker";
+
+    const nearby =
+        livePlayerList(players).filter(
+            function(p) {
+
+                return (
+                    (p.role || "hider")
+                    === oppositeRole
+                );
+            }
+        );
+
+    let nearestM = Infinity;
+
+    nearby.forEach(
+        function(p) {
+
+            const dx =
+                metersEastWest(
+                    myLastLat,
+                    myLastLng,
+                    p.lng
+                );
+
+            const dy =
+                metersNorthSouth(
+                    myLastLat,
+                    p.lat
+                );
+
+            const dist =
+                Math.hypot(dx, dy);
+
+            if (dist < nearestM) {
+
+                nearestM = dist;
+            }
+        }
+    );
+
+    if (nearestM <= PROXIMITY_RADIUS_M) {
+
+        proximityBanner.textContent =
+
+            (
+                oppositeRole === "seeker"
+                    ? "⚠️ SEEKER NEARBY — "
+                    : "⚠️ HIDER NEARBY — "
+            )
+            + Math.round(nearestM)
+            + "m";
+
+        proximityBanner.classList.add("show");
+
+        if (!wasInProximity) {
+
+            if (navigator.vibrate) {
+
+                navigator.vibrate(
+                    [120, 60, 120]
+                );
+            }
+
+            wasInProximity = true;
+        }
+
+    } else {
+
+        proximityBanner.classList.remove("show");
+
+        wasInProximity = false;
+    }
 }
 
 
@@ -4942,7 +6364,8 @@ function renderMapPlayers(players) {
                     html: avatarHTML(
                         p.name,
                         p.color,
-                        p.heading
+                        p.heading,
+                        p.role
                     ),
                     className: "",
                     iconSize: [40, 40]
@@ -5075,6 +6498,13 @@ function renderGridPlayers(players) {
             );
 
             el.innerHTML =
+                (
+                    p.role === "seeker"
+                        ? '<div class="avatar-role seeker">🔍</div>'
+                        : p.role === "hider"
+                            ? '<div class="avatar-role hider">🙈</div>'
+                            : ""
+                ) +
                 '<div class="avatar-name">' +
                 escapeHtml(p.name || "Explorer") +
                 '</div>' +
